@@ -41,8 +41,8 @@ public class Lector extends javax.swing.JFrame {
 
     //static
     private static Lector MyInstance;
-    public static String bascula = "";
-    public static String humedad = "";
+    private static String bascula = "";
+    private static String humedad = "";
     public static boolean leyendoPuerto1= false;
     public static boolean leyendoPuerto2= false;
     public static HttpServer server = null;
@@ -136,6 +136,10 @@ public class Lector extends javax.swing.JFrame {
 
     public static String getHumedad() {
         return humedad.trim().substring(0,10);
+    }
+
+    public static void setBascula(String s) {
+        bascula=s;
     }
 
     /**
