@@ -8,11 +8,23 @@ package com.mpf.tools.zonaslector;
 import com.fazecast.jSerialComm.SerialPort;
 import com.sun.net.httpserver.HttpServer;
 
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowStateListener;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.*;
 
 /**
@@ -23,9 +35,17 @@ public class Lector extends javax.swing.JFrame {
 
     //variables
     SerialPort[] ports;
+    TrayIcon trayIcon;
+    SystemTray tray;
+    HttpServer server = null;
 
     //static
     private static Lector MyInstance;
+    public static String bascula = "";
+    public static String humedad = "";
+    public static boolean leyendoPuerto1= false;
+    public static boolean leyendoPuerto2= false;
+    
     /**
      * Creates new form Lector
      */
@@ -35,6 +55,78 @@ public class Lector extends javax.swing.JFrame {
         //loadVariable
         ports = SerialPort.getCommPorts();
         getPortsToModel(cboPorts);
+        //
+        if(SystemTray.isSupported() ){
+            System.out.println("system tray supported");
+            tray=SystemTray.getSystemTray();
+
+            Image image = Toolkit.getDefaultToolkit().getImage( getClass().getResource( "/icons/iconobascula.png" ) );
+            ActionListener exitListener=new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    System.exit(0);
+                }
+            };
+            PopupMenu popup=new PopupMenu();
+            MenuItem defaultItem = new MenuItem("Salir");
+            defaultItem.addActionListener(exitListener);
+            popup.add(defaultItem);
+
+            popup.add(new MenuItem("-") );
+            defaultItem = new MenuItem("Mostrar");
+            defaultItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    setVisible(true);
+                    setExtendedState(JFrame.NORMAL);
+                }
+            });
+            popup.add(defaultItem);
+
+            trayIcon=new TrayIcon(image, "Sensor de bascula y medidor de Humedad.", popup);
+            trayIcon.setImageAutoSize(true);
+        }else{
+            System.out.println("Este sistema no soporta ocultar la  aplicacion en el SysTray");
+        }
+
+        addWindowStateListener(new WindowStateListener() {
+            public void windowStateChanged(WindowEvent e) {
+                if(e.getNewState()==ICONIFIED){
+                    try {
+                        tray.add(trayIcon);
+                        setVisible(false);
+                        System.out.println("added to SystemTray");
+                    } catch (AWTException ex) {
+                        System.out.println("unable to add to tray");
+                    }
+                }
+                if(e.getNewState()==7){
+                    try{
+                        tray.add(trayIcon);
+                        setVisible(false);
+                        System.out.println("added to SystemTray");
+                    }catch(AWTException ex){
+                        System.out.println("unable to add to system tray");
+                    }
+                }
+                if(e.getNewState()==MAXIMIZED_BOTH){
+                    tray.remove(trayIcon);
+                    setVisible(true);
+                    System.out.println("Tray icon removed");
+                }
+                if(e.getNewState()==NORMAL){
+                    tray.remove(trayIcon);
+                    setVisible(true);
+                    System.out.println("Tray icon removed");
+                }
+            }
+        });
+        //set icono
+        //setIconImage(Toolkit.getDefaultToolkit().getImage(""));
+        //this.setIconImage(new ImageIcon(getClass().getResource("/icons/iconobascula.png")).getImage());
+
+
+        //cerrar oon exit.
+        //setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
     }
 
     /**
@@ -62,6 +154,9 @@ public class Lector extends javax.swing.JFrame {
         CMDCerrar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Lector de Sensores");
+        setIconImage(getIconImage());
+        setResizable(false);
 
         lblLectura.setEditable(false);
         lblLectura.setColumns(60);
@@ -96,7 +191,7 @@ public class Lector extends javax.swing.JFrame {
 
         jLabel4.setText("puerto web:  8002");
 
-        cmdReloadPorts.setText("Cargar Puertos");
+        cmdReloadPorts.setText("Detectar  Puertos");
         cmdReloadPorts.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cmdReloadPortsActionPerformed(evt);
@@ -143,7 +238,7 @@ public class Lector extends javax.swing.JFrame {
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(cmdStartWebServer)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(CMDCerrar, javax.swing.GroupLayout.DEFAULT_SIZE, 169, Short.MAX_VALUE))))
+                                .addComponent(CMDCerrar, javax.swing.GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE))))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -202,9 +297,20 @@ public class Lector extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void cmdLeerBasculaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdLeerBasculaActionPerformed
-        System.out.println("Puertos: " + ports.length);
-        SerialPort comPort = (SerialPort) cboPorts.getSelectedItem();
-        ReadPort bascula = new ReadPort("MyBsccula", comPort);
+        
+        if ( !Lector.leyendoPuerto1 ) {
+            System.out.println("Puertos: " + ports.length);
+            SerialPort comPort = (SerialPort) cboPorts.getSelectedItem();
+            ReadPort bascula = new ReadPort("MyBsccula", comPort);
+            try {
+                TimeUnit.MILLISECONDS.sleep(300);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Lector.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        Lector.getLector().setText(Lector.bascula);
+
     }//GEN-LAST:event_cmdLeerBasculaActionPerformed
 
     private void cmdReloadPortsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdReloadPortsActionPerformed
@@ -247,18 +353,21 @@ public class Lector extends javax.swing.JFrame {
     }//GEN-LAST:event_CMDCerrarActionPerformed
 
     private void cmdStartWebServerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdStartWebServerActionPerformed
-
-        HttpServer server = null;
         try {
-            ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
+            // verificar puerto 01
+            // verificar si se puede leer puerto 01
+            // verificar si esta baierto puerto 02
 
-            server = HttpServer.create(new InetSocketAddress("localhost", 8001), 0);
-            server.createContext("/", new MyHttpHandler() );
-            server.setExecutor( threadPoolExecutor );
-            server.start();
-            System.out.println("Server started on port 8001");
-        } catch (IOException e) {
+            //iniciar webserver
+            SimpleHTTPServer.StartWebServer( server );
+
+            //ocultar
+            tray.add(trayIcon);
+            setVisible(false);
+                        
+        } catch (Exception e) {
             e.printStackTrace();
+            JOptionPane.showMessageDialog(this, e.getMessage(),"Errro Al iniciar Servicio",JOptionPane.ERROR_MESSAGE);
         }
 
     }//GEN-LAST:event_cmdStartWebServerActionPerformed
@@ -338,4 +447,61 @@ public class Lector extends javax.swing.JFrame {
     public static JLabel getStatus(){
         return MyInstance.lblStatus;
     }
+    
+    public Image getMyIconApp(){
+        
+        String ruta = this.getClass().getResource("").toString();
+        System.out.println("ruta:" + ruta );
+        ImageIcon image = null;
+        try {
+            image = new ImageIcon( getClass().getResource( "/icons/iconobascula.png" ) );
+        } catch (Exception  ex) {
+            Logger.getLogger(Lector.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return image.getImage();
+    }
+
+
+    // get a file from the resources folder
+    // works everywhere, IDEA, unit test and JAR file.
+    private InputStream getFileFromResourceAsStream(String fileName) {
+
+        // The class loader that loaded the class
+        ClassLoader classLoader = getClass().getClassLoader();
+        InputStream inputStream = classLoader.getResourceAsStream(fileName);
+        InputStream inputStream2 = classLoader.getResourceAsStream("");
+        System.out.println(inputStream2.toString()  );
+
+        // the stream holding the file content
+        if (inputStream == null) {
+            throw new IllegalArgumentException("Archivo no encontrado! " + fileName);
+        } else {
+            return inputStream;
+        }
+
+    }
+
+    /*
+        The resource URL is not working in the JAR
+        If we try to access a file that is inside a JAR,
+        It throws NoSuchFileException (linux), InvalidPathException (Windows)
+
+        Resource URL Sample: file:java-io.jar!/json/file1.json
+     */
+    private File getFileFromResource(String fileName) throws URISyntaxException {
+
+        ClassLoader classLoader = getClass().getClassLoader();
+        URL resource = classLoader.getResource(fileName);
+        if (resource == null) {
+            throw new IllegalArgumentException("Archivo no encontrado! " + fileName + ". (" + resource.getPath() + ")");
+
+        } else {
+            // failed if files have whitespaces or special characters
+            //return new File(resource.getFile());
+            return new File(resource.toURI());
+        }
+
+    }
+
+
 }

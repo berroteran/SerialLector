@@ -1,24 +1,29 @@
 package com.mpf.tools.zonaslector;
 
+import com.sun.net.httpserver.HttpServer;
+
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Date;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * Java program to create a simple HTTP Server to demonstrate how to use * ServerSocket and Socket class. * * @author Javin Paul
  */
 public class SimpleHTTPServer {
-    public static void main(String args[]) throws IOException {
-        ServerSocket server = new ServerSocket(8080);
-        System.out.println("Listening for connection on port 8080 ....");
-        while (true) {
-            try (Socket socket = server.accept()) {
-                Date today = new Date();
-                String httpResponse = "HTTP/1.1 200 OK\r\n\r\n" + today;
-                socket.getOutputStream().write(httpResponse.getBytes("UTF-8"));
-            }
-        }
+
+    public static void StartWebServer(HttpServer server) throws IOException {
+        ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
+
+        server = HttpServer.create(new InetSocketAddress("localhost", 8001), 0);
+        server.createContext("/", new MyHttpHandler() );
+        server.setExecutor( threadPoolExecutor );
+        server.start();
+        System.out.println("Server started on port 8001");
     }
+
 }
 
