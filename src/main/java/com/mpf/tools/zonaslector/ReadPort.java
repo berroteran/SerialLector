@@ -27,9 +27,13 @@ public class ReadPort implements Runnable {
 
     public void run() {
         Lector.leyendoPuerto1 = this.comPort.openPort();
-        comPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 0, 0);
-        InputStream in = comPort.getInputStream();
         try {
+            if (!Lector.leyendoPuerto1)
+                throw new Exception("No se pudo abrir el puerto");
+            
+            comPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 0, 0);
+            InputStream in = comPort.getInputStream();
+
             while (!detener) {
                 while (comPort.bytesAvailable() == 0)
                     Thread.sleep(250);
@@ -47,8 +51,8 @@ public class ReadPort implements Runnable {
             }
 
         } catch (Exception e) {
-            Lector.getStatus().setText("Puerto No disponible: " + e.getMessage());
-            //e.printStackTrace();
+            Lector.getStatus().setText("Puerto 01 No disponible: " + e.getMessage());
+            e.printStackTrace();
             Lector.leyendoPuerto1 = false;
         }
         comPort.closePort();

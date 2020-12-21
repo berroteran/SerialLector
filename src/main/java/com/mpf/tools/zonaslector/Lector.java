@@ -37,7 +37,7 @@ public class Lector extends javax.swing.JFrame {
     SerialPort[] ports;
     TrayIcon trayIcon;
     SystemTray tray;
-    HttpServer server = null;
+    
 
     //static
     private static Lector MyInstance;
@@ -45,6 +45,7 @@ public class Lector extends javax.swing.JFrame {
     public static String humedad = "";
     public static boolean leyendoPuerto1= false;
     public static boolean leyendoPuerto2= false;
+    public static HttpServer server = null;
     
     /**
      * Creates new form Lector
@@ -144,14 +145,13 @@ public class Lector extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         cboPorts = new javax.swing.JComboBox<>();
         lblStatus = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         cboPorts2 = new javax.swing.JComboBox<>();
-        jLabel4 = new javax.swing.JLabel();
         cmdReloadPorts = new javax.swing.JButton();
         cmdStartWebServer = new javax.swing.JButton();
         cmdLeerHumedad = new javax.swing.JButton();
         CMDCerrar = new javax.swing.JButton();
+        chkJustOne = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Lector de Sensores");
@@ -179,17 +179,13 @@ public class Lector extends javax.swing.JFrame {
         cboPorts.setName("cboPorts"); // NOI18N
 
         lblStatus.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        lblStatus.setText(".");
+        lblStatus.setText("///");
         lblStatus.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         lblStatus.setName("lblStatus"); // NOI18N
-
-        jLabel2.setText("puerto web:  8001");
 
         jLabel3.setText("Puerto M. Humedad");
 
         cboPorts2.setName("cboPorts"); // NOI18N
-
-        jLabel4.setText("puerto web:  8002");
 
         cmdReloadPorts.setText("Detectar  Puertos");
         cmdReloadPorts.addActionListener(new java.awt.event.ActionListener() {
@@ -220,6 +216,13 @@ public class Lector extends javax.swing.JFrame {
             }
         });
 
+        chkJustOne.setText("Usar solo 1 puerto");
+        chkJustOne.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkJustOneActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -231,33 +234,26 @@ public class Lector extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(cmdReloadPorts, javax.swing.GroupLayout.PREFERRED_SIZE, 236, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel4)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(cmdStartWebServer)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(CMDCerrar, javax.swing.GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE))))
+                        .addComponent(cmdStartWebServer)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(CMDCerrar, javax.swing.GroupLayout.DEFAULT_SIZE, 91, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(cmdLeerBascula, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(cmdLeerHumedad, javax.swing.GroupLayout.DEFAULT_SIZE, 121, Short.MAX_VALUE)))
+                            .addComponent(cmdLeerHumedad, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel3)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(cboPorts2, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(cboPorts, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabel2)))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(cboPorts, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(cboPorts2, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(chkJustOne, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -274,13 +270,12 @@ public class Lector extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(cboPorts, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2))
+                    .addComponent(cboPorts, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
                     .addComponent(cboPorts2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel3))
+                    .addComponent(jLabel3)
+                    .addComponent(chkJustOne))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(cmdReloadPorts, javax.swing.GroupLayout.DEFAULT_SIZE, 28, Short.MAX_VALUE)
@@ -297,21 +292,18 @@ public class Lector extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void cmdLeerBasculaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdLeerBasculaActionPerformed
-        
-        if ( !Lector.leyendoPuerto1 ) {
-            System.out.println("Puertos: " + ports.length);
-            SerialPort comPort = (SerialPort) cboPorts.getSelectedItem();
-            ReadPort bascula = new ReadPort("MyBsccula", comPort);
-            try {
-                TimeUnit.MILLISECONDS.sleep(300);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(Lector.class.getName()).log(Level.SEVERE, null, ex);
-            }
+
+        try {
+            iniciarLeerPuerto01();
+            TimeUnit.MILLISECONDS.sleep(300);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(),"Error a intentar leer el puerto01",JOptionPane.ERROR_MESSAGE);
         }
 
         Lector.getLector().setText(Lector.bascula);
 
     }//GEN-LAST:event_cmdLeerBasculaActionPerformed
+
 
     private void cmdReloadPortsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdReloadPortsActionPerformed
         // TODO add your handling code here:
@@ -343,7 +335,7 @@ public class Lector extends javax.swing.JFrame {
         }
         comPort.closePort();
          }else{
-             System.out.println("Error: Port is currently in use");
+             System.out.println("Error: Puerto Actualmente en USO");
              lblStatus.setText("Puerto en USO");
          }
     }//GEN-LAST:event_cmdLeerHumedadActionPerformed
@@ -354,15 +346,27 @@ public class Lector extends javax.swing.JFrame {
 
     private void cmdStartWebServerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdStartWebServerActionPerformed
         try {
+            if ( ((SerialPort) cboPorts.getSelectedItem()).getDescriptivePortName().equals(  ((SerialPort) cboPorts2.getSelectedItem()).getDescriptivePortName()  ) ){
+                if ( !this.chkJustOne.isSelected() ){
+                    throw new Exception("Los puertos a utilizar no pueden ser el mismo. ");
+                }
+            } 
             // verificar puerto 01
+            if ( !Lector.leyendoPuerto1 )
+                iniciarLeerPuerto01();
+
             // verificar si se puede leer puerto 01
             // verificar si esta baierto puerto 02
 
             //iniciar webserver
-            SimpleHTTPServer.StartWebServer( server );
+            if ( this.server == null )
+                SimpleHTTPServer.StartWebServer( );
 
             //ocultar
-            tray.add(trayIcon);
+            try{
+                tray.add(trayIcon);
+            }catch(Exception e){}
+            
             setVisible(false);
                         
         } catch (Exception e) {
@@ -371,6 +375,10 @@ public class Lector extends javax.swing.JFrame {
         }
 
     }//GEN-LAST:event_cmdStartWebServerActionPerformed
+
+    private void chkJustOneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkJustOneActionPerformed
+        cboPorts2.setEnabled( !chkJustOne.isSelected());
+    }//GEN-LAST:event_chkJustOneActionPerformed
 
     /**
      * @param args the command line arguments
@@ -413,14 +421,13 @@ public class Lector extends javax.swing.JFrame {
     private javax.swing.JButton CMDCerrar;
     private javax.swing.JComboBox<SerialPort> cboPorts;
     private javax.swing.JComboBox<SerialPort> cboPorts2;
+    private javax.swing.JCheckBox chkJustOne;
     private javax.swing.JButton cmdLeerBascula;
     private javax.swing.JButton cmdLeerHumedad;
     private javax.swing.JButton cmdReloadPorts;
     private javax.swing.JButton cmdStartWebServer;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea lblLectura;
     private javax.swing.JLabel lblStatus;
@@ -503,5 +510,11 @@ public class Lector extends javax.swing.JFrame {
 
     }
 
-
+    private void iniciarLeerPuerto01() throws InterruptedException {
+        if ( !Lector.leyendoPuerto1 ) {
+            System.out.println("Puertos: " + ports.length);
+            SerialPort comPort = (SerialPort) cboPorts.getSelectedItem();
+            ReadPort bascula = new ReadPort("MyBsccula", comPort);
+        }
+    }
 }

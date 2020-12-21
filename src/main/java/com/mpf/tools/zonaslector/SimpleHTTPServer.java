@@ -15,14 +15,16 @@ import java.util.concurrent.ThreadPoolExecutor;
  */
 public class SimpleHTTPServer {
 
-    public static void StartWebServer(HttpServer server) throws IOException {
-        ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
+    public static void StartWebServer() throws IOException {
+        if ( Lector.server == null ){
+            ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
 
-        server = HttpServer.create(new InetSocketAddress("localhost", 8001), 0);
-        server.createContext("/", new MyHttpHandler() );
-        server.setExecutor( threadPoolExecutor );
-        server.start();
-        System.out.println("Server started on port 8001");
+            Lector.server = HttpServer.create(new InetSocketAddress("localhost", 8001), 0);
+            Lector.server.createContext("/", new MyHttpHandler() );
+            Lector.server.setExecutor( threadPoolExecutor );
+            Lector.server.start();
+            System.out.println("Server started on port 8001");
+        }
     }
 
 }
