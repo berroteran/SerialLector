@@ -39,9 +39,9 @@ public class MyHttpHandler implements HttpHandler {
         String valor = "";
         System.out.println("valor parametro: " + par);
         if ( par.equals("b")){
-            valor =  Lector.bascula;
+            valor =  Lector.getBascula();
         }else{
-            valor = Lector.humedad;
+            valor = Lector.getHumedad();
         }
         return valor;
     }

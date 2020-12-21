@@ -130,6 +130,14 @@ public class Lector extends javax.swing.JFrame {
 
     }
 
+    public static String getBascula() {
+        return bascula.trim().substring(0,10);
+    }
+
+    public static String getHumedad() {
+        return humedad.trim().substring(0,10);
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
