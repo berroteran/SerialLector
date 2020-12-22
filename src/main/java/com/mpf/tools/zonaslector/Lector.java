@@ -56,13 +56,13 @@ public class Lector extends javax.swing.JFrame {
         initComponents();
         //loadVariable
         ports = SerialPort.getCommPorts();
-        getPortsToModel(cboPorts);
+        getPortsToModel();
         //
         if(SystemTray.isSupported() ){
             System.out.println("system tray supported");
             tray=SystemTray.getSystemTray();
 
-            Image image = Toolkit.getDefaultToolkit().getImage( getClass().getResource( "/icons/iconobascula.png" ) );
+            //Image image = Toolkit.getDefaultToolkit().getImage( getClass().getResource( "/icons/iconobascula.png" ) );
             ActionListener exitListener=new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     System.exit(0);
@@ -83,8 +83,8 @@ public class Lector extends javax.swing.JFrame {
             });
             popup.add(defaultItem);
 
-            trayIcon=new TrayIcon( image , "Sensor de bascula y medidor de Humedad.", popup);
-            trayIcon.setImageAutoSize(true);
+            //trayIcon=new TrayIcon( image , "Sensor de bascula y medidor de Humedad.", popup);
+            //trayIcon.setImageAutoSize(true);
         }else{
             System.out.println("Este sistema no soporta ocultar la  aplicacion en el SysTray");
         }
@@ -132,11 +132,19 @@ public class Lector extends javax.swing.JFrame {
     }
 
     public static String getBascula() {
-        return bascula.trim().replaceAll("[^\\d.]", "").substring(0,10);
+        System.out.println("Antes de limpiar: " + bascula );
+        String value = bascula.trim().replaceAll("[^\\d.]", "");
+        if ( value.length() > 10 )
+            value=value.substring(0,10);
+        return value;
     }
 
     public static String getHumedad() {
-        return humedad.replaceAll("[^\\d.]", "").trim().substring(0,10);
+        System.out.println("Antes de limpiar: " + humedad );
+        String value = humedad.trim().replaceAll("[^\\d.]", "");
+        if ( value.length() > 10 )
+            value=value.substring(0,10);
+        return value;
     }
 
     public static void setBascula(String s) {
@@ -314,13 +322,13 @@ public class Lector extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, e.getMessage(),"Error a intentar leer el puerto01",JOptionPane.ERROR_MESSAGE);
         }
 
-        Lector.getLector().setText(Lector.bascula);
+        Lector.getLector().setText(Lector.getBascula());
 
     }//GEN-LAST:event_cmdLeerBasculaActionPerformed
 
 
     private void cmdReloadPortsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdReloadPortsActionPerformed
-        // TODO add your handling code here:
+        getPortsToModel();
     }//GEN-LAST:event_cmdReloadPortsActionPerformed
 
     private void cmdLeerHumedadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdLeerHumedadActionPerformed
@@ -452,7 +460,9 @@ public class Lector extends javax.swing.JFrame {
     private javax.swing.JLabel lblStatus;
     // End of variables declaration//GEN-END:variables
 
-    private void getPortsToModel(JComboBox cbo) {
+    //carga todos los puertos existentes en los CBO
+    private void getPortsToModel() {
+        ports = SerialPort.getCommPorts();
         SerialPort[] ports = SerialPort.getCommPorts();
         cboPorts.removeAll();
         cboPorts2.removeAll();
