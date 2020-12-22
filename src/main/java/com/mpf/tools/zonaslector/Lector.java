@@ -332,34 +332,17 @@ public class Lector extends javax.swing.JFrame {
     }//GEN-LAST:event_cmdReloadPortsActionPerformed
 
     private void cmdLeerHumedadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdLeerHumedadActionPerformed
-        System.out.println("Puertos: " + ports.length);
-        SerialPort comPort = (SerialPort) cboPorts2.getSelectedItem();
-         if ( comPort.isOpen()) {
-        comPort.openPort();
-        comPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 0, 0);
-        InputStream in = comPort.getInputStream();
-        try {
-            
-               while (true)
-                {
-                   while ( comPort.bytesAvailable() == 0)
-                      Thread.sleep(20);
-                   byte[] readBuffer = new byte[comPort.bytesAvailable()];
-                   String texto = readBuffer.toString();
-                   int numRead = comPort.readBytes(readBuffer, readBuffer.length);
-                   System.out.println( "Read " + numRead + " bytes.");
-                   lblLectura.setText( "texto: " + texto);
-                }
 
+        try {
+            iniciarLeerPuerto02();
+            TimeUnit.MILLISECONDS.sleep(300);
         } catch (Exception e) {
-            lblStatus.setText("Puerto No disponible: "+ e.getMessage());
-            e.printStackTrace();
+            lblStatus.setText( "** " + e.getMessage() );
+            JOptionPane.showMessageDialog(this, e.getMessage(),"Error a intentar leer el puerto02",JOptionPane.ERROR_MESSAGE);
         }
-        comPort.closePort();
-         }else{
-             System.out.println("Error: Puerto Actualmente en USO");
-             lblStatus.setText("Puerto en USO");
-         }
+
+        Lector.getLector().setText(Lector.getBascula());
+
     }//GEN-LAST:event_cmdLeerHumedadActionPerformed
 
     private void CMDCerrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CMDCerrarActionPerformed
@@ -546,6 +529,15 @@ public class Lector extends javax.swing.JFrame {
             ReadPort bascula = new ReadPort("MyBsccula", comPort);
         }
     }
+
+    private void iniciarLeerPuerto02() throws InterruptedException {
+        if ( !Lector.leyendoPuerto2 ) {
+            System.out.println("Puertos(2): " + ports.length);
+            SerialPort comPort = (SerialPort) cboPorts2.getSelectedItem();
+            ReadPort hiloHumedad = new ReadPort("MySensoHumedad", comPort);
+        }
+    }
+
 
     private Image getIconResource() {
         URL resource = Lector.class.getClass().getResource( "/icons/iconobascula.png");
