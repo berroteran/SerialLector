@@ -13,6 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -82,7 +83,7 @@ public class Lector extends javax.swing.JFrame {
             });
             popup.add(defaultItem);
 
-            trayIcon=new TrayIcon(image, "Sensor de bascula y medidor de Humedad.", popup);
+            trayIcon=new TrayIcon( image , "Sensor de bascula y medidor de Humedad.", popup);
             trayIcon.setImageAutoSize(true);
         }else{
             System.out.println("Este sistema no soporta ocultar la  aplicacion en el SysTray");
@@ -131,11 +132,11 @@ public class Lector extends javax.swing.JFrame {
     }
 
     public static String getBascula() {
-        return bascula.trim().substring(0,10);
+        return bascula.trim().replaceAll("[^\\d.]", "").substring(0,10);
     }
 
     public static String getHumedad() {
-        return humedad.trim().substring(0,10);
+        return humedad.replaceAll("[^\\d.]", "").trim().substring(0,10);
     }
 
     public static void setBascula(String s) {
@@ -167,7 +168,7 @@ public class Lector extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Lector de Sensores");
-        setIconImage(getIconImage());
+        //setIconImage(getIconResource());
         setResizable(false);
 
         lblLectura.setEditable(false);
@@ -303,6 +304,7 @@ public class Lector extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+
     private void cmdLeerBasculaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdLeerBasculaActionPerformed
 
         try {
@@ -424,7 +426,12 @@ public class Lector extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Lector().setVisible(true);
+                try {
+                    new Lector().setVisible(true);
+                }catch(Exception e){
+                    e.printStackTrace();
+                    System.exit(0);
+                }
             }
         });
     }
@@ -529,4 +536,16 @@ public class Lector extends javax.swing.JFrame {
             ReadPort bascula = new ReadPort("MyBsccula", comPort);
         }
     }
+
+    private Image getIconResource() {
+        URL resource = Lector.class.getClass().getResource( "/icons/iconobascula.png");
+        BufferedImage image = null;
+        try {
+            image = ImageIO.read( resource );
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return image;
+    }
+
 }

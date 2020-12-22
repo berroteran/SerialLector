@@ -47,6 +47,7 @@ public class ReadPort implements Runnable {
                 //Lector.getLector().setText(Lector.getLector().getText() + "\n" + "(" + numBytesRead + " Bytes Leidos) Textos: \"" + new String(readBuffer) + "\"");
                 //Lector.getLector().setText(Lector.getLector().getText() + "\n" + "Reading complete!\n");
                 //Lector.getLector().setText(Lector.getLector().getText() + "\n" + new String(readBuffer));
+                System.out.println( "Lectura del puerto: " + new String(readBuffer) );
                 Lector.setBascula( new String(readBuffer) );
             }
 
