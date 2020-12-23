@@ -5,9 +5,21 @@ import com.sun.net.httpserver.HttpHandler;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+
 import org.apache.commons.lang3.StringEscapeUtils;
 
 public class MyHttpHandler implements HttpHandler {
+    private static final String HEADER_ALLOW = "Allow";
+    private static final String HEADER_CONTENT_TYPE = "Content-Type";
+
+    private static final Charset CHARSET = StandardCharsets.UTF_8;
+
+    private static final int STATUS_OK = 200;
+    private static final int STATUS_METHOD_NOT_ALLOWED = 405;
+
+    private static final int NO_RESPONSE_LENGTH = -1;
 
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
@@ -18,6 +30,15 @@ public class MyHttpHandler implements HttpHandler {
         }else if("POST".equals(httpExchange)) {
             requestParamValue = handlePostRequest(httpExchange);
         }
+        //
+        httpExchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+        if (httpExchange.getRequestMethod().equalsIgnoreCase("OPTIONS")) {
+            httpExchange.getResponseHeaders().add("Access-Control-Allow-Methods", "GET, OPTIONS");
+            httpExchange.getResponseHeaders().add("Access-Control-Allow-Headers", "Content-Type,Authorization");
+            httpExchange.sendResponseHeaders(204, -1);
+            return;
+        }
+        httpExchange.getResponseHeaders().add( HEADER_CONTENT_TYPE, String.format("application/json; charset=%s", CHARSET));
         handleResponse(httpExchange,requestParamValue);
     }
 
@@ -50,18 +71,14 @@ public class MyHttpHandler implements HttpHandler {
         requestParamValue = requestParamValue == null ? "" : requestParamValue;
         OutputStream outputStream = httpExchange.getResponseBody();
         StringBuilder htmlBuilder = new StringBuilder();
-        htmlBuilder.append("<html>").
-        append("<body>").
-        append("<h1>").
-            append("Hello ")
-                .append(requestParamValue)
-                .append("</h1>")
-                .append("</body>")
-                .append("</html>");
+
+
+        htmlBuilder.append("{\"status\":\"OK\", \"data\" : [ {\"port1\":\"" + Lector.getBascula() + "\"} ]}");
         // encode HTML content
         String htmlResponse = htmlBuilder.toString();
         // this line is a must
         httpExchange.sendResponseHeaders(200, htmlResponse.length());
+
         outputStream.write(htmlResponse.getBytes());
         outputStream.flush();
         outputStream.close();

@@ -2,6 +2,7 @@ package com.mpf.tools.zonaslector;
 
 import com.sun.net.httpserver.HttpServer;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
@@ -14,16 +15,23 @@ import java.util.concurrent.ThreadPoolExecutor;
  * Java program to create a simple HTTP Server to demonstrate how to use * ServerSocket and Socket class. * * @author Javin Paul
  */
 public class SimpleHTTPServer {
+    private static final String HOSTNAME = "localhost";
+    private static final int PORT = 8001;
+    private static final int BACKLOG = 1;
 
     public static void StartWebServer() throws IOException {
         if ( Lector.server == null ){
-            ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
+            try {
+                ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
 
-            Lector.server = HttpServer.create(new InetSocketAddress("localhost", 8001), 0);
-            Lector.server.createContext("/", new MyHttpHandler() );
-            Lector.server.setExecutor( threadPoolExecutor );
-            Lector.server.start();
-            System.out.println("Server started on port 8001");
+                Lector.server = HttpServer.create(new InetSocketAddress(HOSTNAME, PORT), BACKLOG);
+                Lector.server.createContext("/", new MyHttpHandler());
+                Lector.server.setExecutor(threadPoolExecutor);
+                Lector.server.start();
+                System.out.println("Server started on port:" + PORT);
+            }catch (Exception e){
+                throw new EOFException("No se pudo iniciar servicio. "  +e.getMessage());
+            }
         }
     }
 
