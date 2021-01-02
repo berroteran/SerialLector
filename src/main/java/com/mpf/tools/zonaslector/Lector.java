@@ -59,10 +59,9 @@ public class Lector extends javax.swing.JFrame {
         getPortsToModel();
         //
         if(SystemTray.isSupported() ){
-            System.out.println("system tray supported");
             tray=SystemTray.getSystemTray();
 
-            //Image image = Toolkit.getDefaultToolkit().getImage( getClass().getResource( "/icons/iconobascula.png" ) );
+            Image image =Toolkit.getDefaultToolkit().getImage( (URL) getClass().getClassLoader().getResource( "resources/icons/iconobascula.png" ) );
             ActionListener exitListener=new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     System.exit(0);
@@ -83,8 +82,8 @@ public class Lector extends javax.swing.JFrame {
             });
             popup.add(defaultItem);
 
-            //trayIcon=new TrayIcon( image , "Sensor de bascula y medidor de Humedad.", popup);
-            //trayIcon.setImageAutoSize(true);
+            trayIcon=new TrayIcon( image , "Sensor de bascula y medidor de Humedad.", popup);
+            trayIcon.setImageAutoSize(true);
         }else{
             System.out.println("Este sistema no soporta ocultar la  aplicacion en el SysTray");
         }
@@ -137,7 +136,7 @@ public class Lector extends javax.swing.JFrame {
         if ( value.length() > 10 )
             value=value.substring(0,10);
         if ( value.equals("") )
-            value = "0.0";
+            value = "0";
         return value;
     }
 
@@ -178,6 +177,13 @@ public class Lector extends javax.swing.JFrame {
         CMDCerrar = new javax.swing.JButton();
         chkJustOne = new javax.swing.JCheckBox();
         jLabel2 = new javax.swing.JLabel();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenu1 = new javax.swing.JMenu();
+        jMenuItem1 = new javax.swing.JMenuItem();
+        jMenuItem2 = new javax.swing.JMenuItem();
+        jMenu2 = new javax.swing.JMenu();
+        jMenu3 = new javax.swing.JMenu();
+        jMenuItem3 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Lector de Sensores");
@@ -250,6 +256,33 @@ public class Lector extends javax.swing.JFrame {
         });
 
         jLabel2.setText("Ver 0.8.11");
+
+        jMenu1.setText("File");
+
+        jMenuItem1.setText("Iniciar servicio Modo Desarrollo");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem1);
+
+        jMenuItem2.setText("Salir");
+        jMenu1.add(jMenuItem2);
+
+        jMenuBar1.add(jMenu1);
+
+        jMenu2.setText("Edit");
+        jMenuBar1.add(jMenu2);
+
+        jMenu3.setText("Ayuda");
+
+        jMenuItem3.setText("Acerca de");
+        jMenu3.add(jMenuItem3);
+
+        jMenuBar1.add(jMenu3);
+
+        setJMenuBar(jMenuBar1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -405,7 +438,7 @@ public class Lector extends javax.swing.JFrame {
                         
         } catch (Exception e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(this, e.getMessage(),"Errro Al iniciar Servicio",JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, e.getMessage(),"Error Al iniciar Servicio",JOptionPane.ERROR_MESSAGE);
         }
 
     }//GEN-LAST:event_cmdStartWebServerActionPerformed
@@ -413,6 +446,10 @@ public class Lector extends javax.swing.JFrame {
     private void chkJustOneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkJustOneActionPerformed
         cboPorts2.setEnabled( !chkJustOne.isSelected());
     }//GEN-LAST:event_chkJustOneActionPerformed
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -468,6 +505,13 @@ public class Lector extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenu jMenu3;
+    private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea lblLectura;
     private javax.swing.JLabel lblStatus;
