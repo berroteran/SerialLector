@@ -667,13 +667,14 @@ public class Lector extends javax.swing.JFrame {
             System.out.println("PuertosMH(2): " + ports.length);
             SerialPort comPortBascula = (SerialPort) cboBasculaPort.getSelectedItem();
             SerialPort comPortMHumedad = (SerialPort) cboMHumedadPort.getSelectedItem();
-            ReadPortsBascula hiloHumedad;
+            ReadPortsBascula hilobascula;
+            ReadPortsHumedad hiloHumedad;
             if ( chk2Basculas.isSelected() ){
                 System.out.println("Iniciando lectura de segunda bascula");
-                hiloHumedad = new ReadPortsBascula("MyBasCula2", comPortBascula);
+                hilobascula = new ReadPortsBascula("MyBasCula2", comPortBascula);
             }else{
                 System.out.println("Iniciando lectura de Sensor de humedad.");
-                hiloHumedad = new ReadPortsBascula("MySensoHumedad", comPortMHumedad);
+                hiloHumedad = new ReadPortsHumedad("MySensoHumedad", comPortMHumedad);
             }
         }
     }
