@@ -72,8 +72,12 @@ public class MyHttpHandler implements HttpHandler {
         OutputStream outputStream = httpExchange.getResponseBody();
         StringBuilder htmlBuilder = new StringBuilder();
 
-
-        htmlBuilder.append("{\"status\":\"OK\", \"data\" : [ {\"port1\":\"" + Lector.getBascula() + "\"} ]}");
+        String cadena = "{\"status\":\"OK\", \"data\" : [ ";
+            cadena += "{\"port1\":\"" + Lector.getBascula() + "\"} ";
+            cadena += "{\"port2\":\"" + Lector.getHumedad() + "\"} ";
+            cadena += "]}";
+        
+        htmlBuilder.append(cadena);
         // encode HTML content
         String htmlResponse = htmlBuilder.toString();
         // this line is a must
