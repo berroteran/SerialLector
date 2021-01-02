@@ -13,7 +13,7 @@ public class ReadPortsBascula implements Runnable {
     boolean detener = false;
 
     public ReadPortsBascula(String myBsccula, SerialPort comPort) {
-        System.out.println("Deteniendo hilo");
+        System.out.println("Deteniendo hilo.Bascula..");
         this.detener = true;
         this.comPort = comPort;
         try {
@@ -34,19 +34,19 @@ public class ReadPortsBascula implements Runnable {
 
     public void run() {
         try {
-            System.out.println("0. INICINADO HILO: " + this.name);
+            System.out.println("0. INICINADO HILO Bascula: " + this.name);
             while (!detener) {
                 Lector.setBascula( readBasculaPort( comPort ) );
             }
 
         } catch (Exception e) {
-            Lector.getStatus().setText("Puerto 01 No disponible: " + e.getMessage());
+            Lector.getStatus().setText("Puerto 01(bascula) No disponible: " + e.getMessage());
             e.printStackTrace();
             Lector.leyendoPuerto1 = false;
         } finally {
             comPort.closePort();
             Lector.leyendoPuerto1 = false;
-            System.out.println("HILO DETENIDO" + this.name);
+            System.out.println("HILO Bascula.DETENIDO" + this.name);
         }
     }
 

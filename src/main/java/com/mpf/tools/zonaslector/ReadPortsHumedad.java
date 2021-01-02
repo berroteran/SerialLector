@@ -62,9 +62,13 @@ public class ReadPortsHumedad implements Runnable {
         comPort.setComPortParameters(4800, 8, 1, 0);
 
         System.out.println("while/Esperando");
-        while (comPort.bytesAvailable() == 0) {
-            Lector.setBascula("-1");
-            Thread.sleep(100);
+        //InputStream in = comPort.getInputStream();
+        for (int i = 0; i < 10; i++) {
+            if (comPort.bytesAvailable() == 0) {
+                Thread.sleep(100);
+            } else {
+                break;
+            }
         }
         //Aplicando pausa estrategica
         Thread.sleep(250);
@@ -75,18 +79,18 @@ public class ReadPortsHumedad implements Runnable {
 
         //convirtiendo a cadena
         texto = new String(readBuffer);
-        System.out.println("Texto (Convertido a): " + texto);
+        System.out.println("MH.Texto (Convertido a): " + texto);
         //Parse
         String humedad = "0";
         if (texto.split(";").length > 9) {
             humedad = (texto.split(";")[1]).trim();
-            System.out.println("Valor FINAL MH a retornar: " + humedad);
+            System.out.println("MH.Valor FINAL MH a retornar: " + humedad);
         }
         Lector.setBascula(humedad);
 
         //cerrando
         comPort.closePort();
-        System.out.println("Puerto Cerrado");
+        System.out.println("MH.Puerto Cerrado");
         Lector.leyendoPuerto2 = false;
         return humedad;
     }
