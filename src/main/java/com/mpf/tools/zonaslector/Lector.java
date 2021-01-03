@@ -38,6 +38,7 @@ public class Lector extends javax.swing.JFrame {
     
 
     //static
+    private static Boolean modoDeveloper = false;
     private static Lector MyInstance;
     private static String bascula = "";
     private static String humedad = "";
@@ -51,6 +52,11 @@ public class Lector extends javax.swing.JFrame {
     public Lector() {
         MyInstance = this;
         initComponents();
+
+        //set Iconos
+        cmdStartWebServer2.setIcon(
+                new javax.swing.ImageIcon( getClass().getClassLoader().getResource( "icons/network_service32.png" ) )
+        );
         //loadVariable
         ports = SerialPort.getCommPorts();
         getPortsToModel();
@@ -58,7 +64,7 @@ public class Lector extends javax.swing.JFrame {
         if(SystemTray.isSupported() ){
             tray=SystemTray.getSystemTray();
 
-            Image image =Toolkit.getDefaultToolkit().getImage( (URL) getClass().getClassLoader().getResource( "resources/icons/iconobascula.png" ) );
+            Image image =Toolkit.getDefaultToolkit().getImage( (URL) getClass().getClassLoader().getResource("icons/iconobascula.png") );
             ActionListener exitListener=new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     System.exit(0);
@@ -128,6 +134,10 @@ public class Lector extends javax.swing.JFrame {
     }
 
     public static String getBascula() {
+        if ( modoDeveloper ){
+            System.out.println("Modo Desarrollo" );
+            return "21.03";   
+        }else{ 
         System.out.println("Antes de limpiar: " + bascula );
         String value = bascula.trim().replaceAll("[^\\d.]", "");
         if ( value.length() > 10 )
@@ -135,9 +145,14 @@ public class Lector extends javax.swing.JFrame {
         if ( value.equals("") )
             value = "0";
         return value;
+        }
     }
 
     public static String getHumedad() {
+        if ( modoDeveloper ){
+            System.out.println("Modo desarrollo: 03.");
+            return "03.21";   
+        }else{ 
         System.out.println("Antes de limpiar: " + humedad );
         String value = humedad.trim().replaceAll("[^\\d.]", "");
         if ( value.length() > 10 )
@@ -145,6 +160,7 @@ public class Lector extends javax.swing.JFrame {
         if ( value.equals("") )
             value = "0.0";
         return value;
+        }
     }
 
     public static void setBascula(String s) {
@@ -175,9 +191,10 @@ public class Lector extends javax.swing.JFrame {
         chkJustOne = new javax.swing.JCheckBox();
         jLabel2 = new javax.swing.JLabel();
         chk2Basculas = new javax.swing.JCheckBox();
+        cmdStartWebServer2 = new javax.swing.JToggleButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
-        jMenuItem1 = new javax.swing.JMenuItem();
+        mnuModoPrueba = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
         jMenu3 = new javax.swing.JMenu();
@@ -197,7 +214,7 @@ public class Lector extends javax.swing.JFrame {
         jScrollPane1.setViewportView(lblLectura);
 
         cmdLeerBascula.setText("Leer Bascula");
-        cmdLeerBascula.setToolTipText("Lee el dato del puertoo serial de la bascula.");
+        cmdLeerBascula.setToolTipText("");
         cmdLeerBascula.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cmdLeerBasculaActionPerformed(evt);
@@ -262,15 +279,22 @@ public class Lector extends javax.swing.JFrame {
             }
         });
 
-        jMenu1.setText("File");
-
-        jMenuItem1.setText("Iniciar servicio Modo Desarrollo");
-        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+        cmdStartWebServer2.setText("Iniciar Servicio");
+        cmdStartWebServer2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem1ActionPerformed(evt);
+                cmdStartWebServer2ActionPerformed(evt);
             }
         });
-        jMenu1.add(jMenuItem1);
+
+        jMenu1.setText("File");
+
+        mnuModoPrueba.setText("Iniciar servicio Modo Desarrollo");
+        mnuModoPrueba.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuModoPruebaActionPerformed(evt);
+            }
+        });
+        jMenu1.add(mnuModoPrueba);
 
         jMenuItem2.setText("Salir");
         jMenu1.add(jMenuItem2);
@@ -307,9 +331,11 @@ public class Lector extends javax.swing.JFrame {
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(cmdLeerBascula, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(cmdLeerHumedad, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(cmdLeerBascula, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(cmdLeerHumedad, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addComponent(cmdStartWebServer2, javax.swing.GroupLayout.Alignment.TRAILING)))
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addGroup(layout.createSequentialGroup()
@@ -339,8 +365,9 @@ public class Lector extends javax.swing.JFrame {
                         .addComponent(cmdLeerBascula, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(cmdLeerHumedad, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 56, Short.MAX_VALUE))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(cmdStartWebServer2))
+                    .addComponent(jScrollPane1))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
@@ -428,44 +455,7 @@ public class Lector extends javax.swing.JFrame {
     }//GEN-LAST:event_CMDCerrarActionPerformed
 
     private void cmdStartWebServerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdStartWebServerActionPerformed
-        try {
-            //validando si ambos puertos son los mismos.
-            if ( ((SerialPort) cboBasculaPort.getSelectedItem()).getDescriptivePortName().equals(  ((SerialPort) cboMHumedadPort.getSelectedItem()).getDescriptivePortName()  ) ){
-                if ( !this.chkJustOne.isSelected() ){
-                    throw new Exception("Los puertos a utilizar no pueden ser el mismo. ");
-                }
-            }
-            
-            // verificar puerto 01
-            if ( !Lector.leyendoPuerto1 )
-                iniciarLeerPuertoB01();
-
-            // verificar si se puede leer puerto 01
-            // verificar si esta baierto puerto 02
-            if ( !chkJustOne.isSelected() ){
-                if ( !Lector.leyendoPuerto2 ){
-                    if ( chk2Basculas.isSelected() )
-                        iniciarLeerPuertoB02();
-                    else
-                        iniciarLeerPuertoMHumedad();
-                }
-            }
-
-            //iniciar webserver
-            if ( this.server == null )
-                SimpleHTTPServer.StartWebServer( );
-
-            //ocultar
-            try{
-                tray.add(trayIcon);
-            }catch(Exception e){}
-            
-            setVisible(false);
-                        
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, e.getMessage(),"Error Al iniciar Servicio",JOptionPane.ERROR_MESSAGE);
-        }
-
+           iniciarServicio();
     }//GEN-LAST:event_cmdStartWebServerActionPerformed
 
     private void chkJustOneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkJustOneActionPerformed
@@ -479,9 +469,16 @@ public class Lector extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_chkJustOneActionPerformed
 
-    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jMenuItem1ActionPerformed
+    private void mnuModoPruebaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuModoPruebaActionPerformed
+        try{
+            iniciarServicioModoDesarroll();
+            cmdStartWebServer.setEnabled(false);
+            cmdStartWebServer2.setSelected(true);
+
+        }catch(Exception e){
+            JOptionPane.showMessageDialog(this, e.getMessage(),"Error Al iniciar Servicio en Modo desarrollo",JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_mnuModoPruebaActionPerformed
 
     private void chk2BasculasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chk2BasculasActionPerformed
        if ( chk2Basculas.isSelected() ){
@@ -494,6 +491,25 @@ public class Lector extends javax.swing.JFrame {
             cmdLeerHumedad.setText("Leer M. de Humedad");
        }
     }//GEN-LAST:event_chk2BasculasActionPerformed
+
+    private void cmdStartWebServer2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdStartWebServer2ActionPerformed
+        if ( cmdStartWebServer2.isSelected() ){
+            try{
+                iniciarServicio();
+                cmdStartWebServer2.setText("Detener Servicio");
+            }catch(Exception e){
+                
+            }
+        } else{
+            try{
+            detenerServicio();
+            cmdStartWebServer2.setText("Iniciar Servicio");
+            }catch(Exception e){
+                
+                
+            }
+        }
+    }//GEN-LAST:event_cmdStartWebServer2ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -547,19 +563,20 @@ public class Lector extends javax.swing.JFrame {
     private javax.swing.JButton cmdLeerHumedad;
     private javax.swing.JButton cmdReloadPorts;
     private javax.swing.JButton cmdStartWebServer;
+    private javax.swing.JToggleButton cmdStartWebServer2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea lblLectura;
     private javax.swing.JLabel lblPuerto2;
     private javax.swing.JLabel lblStatus;
+    private javax.swing.JMenuItem mnuModoPrueba;
     // End of variables declaration//GEN-END:variables
 
     //carga todos los puertos existentes en los CBO
@@ -661,6 +678,53 @@ public class Lector extends javax.swing.JFrame {
             ReadPortsBascula bascula = new ReadPortsBascula("MyBsccula2", comPort);
         }
     }
+
+    private void iniciarServicio(){
+              try {
+            //validando si ambos puertos son los mismos.
+            if ( ((SerialPort) cboBasculaPort.getSelectedItem()).getDescriptivePortName().equals(  ((SerialPort) cboMHumedadPort.getSelectedItem()).getDescriptivePortName()  ) ){
+                if ( !this.chkJustOne.isSelected() ){
+                    throw new Exception("Los puertos a utilizar no pueden ser el mismo. ");
+                }
+            }
+            
+            // verificar puerto 01
+            if ( !Lector.leyendoPuerto1 )
+                iniciarLeerPuertoB01();
+
+            // verificar si se puede leer puerto 01
+            // verificar si esta baierto puerto 02
+            if ( !chkJustOne.isSelected() ){
+                if ( !Lector.leyendoPuerto2 ){
+                    if ( chk2Basculas.isSelected() )
+                        iniciarLeerPuertoB02();
+                    else
+                        iniciarLeerPuertoMHumedad();
+                }
+            }
+
+            //iniciar webserver
+            if ( this.server == null )
+                SimpleHTTPServer.StartWebServer( );
+
+            //ocultar
+            try{
+                tray.add(trayIcon);
+            }catch(Exception e){}
+            
+            setVisible(false);
+                        
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(),"Error Al iniciar Servicio",JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    private void iniciarServicioModoDesarroll() throws IOException{
+            //iniciar webserver
+            modoDeveloper = true;
+            if ( this.server == null )
+                SimpleHTTPServer.StartWebServer( );
+    }
     
     private void iniciarLeerPuertoMHumedad() throws InterruptedException {
         if ( !Lector.leyendoPuerto2 ) {
@@ -689,6 +753,10 @@ public class Lector extends javax.swing.JFrame {
             e.printStackTrace();
         }
         return image;
+    }
+
+    private void detenerServicio() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

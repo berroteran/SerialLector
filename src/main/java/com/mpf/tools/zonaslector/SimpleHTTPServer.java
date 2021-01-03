@@ -34,6 +34,11 @@ public class SimpleHTTPServer {
             }
         }
     }
+    
+    public static void stopServiceHTT(){
+        Lector.server.stop(2);
+        Lector.server = null;
+    }
 
 }
 
