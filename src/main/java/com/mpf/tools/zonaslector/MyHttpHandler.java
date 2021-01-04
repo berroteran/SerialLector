@@ -72,6 +72,7 @@ public class MyHttpHandler implements HttpHandler {
 
         String cadena = "{\"status\":\"OK\", \"data\" : [ ";
             cadena += "{\"port1\":\"" + Lector.getBascula() + "\"} ";
+        cadena += ",";
             cadena += "{\"port2\":\"" + Lector.getHumedad() + "\"} ";
             cadena += "]}";
         
