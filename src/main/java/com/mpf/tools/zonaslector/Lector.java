@@ -26,6 +26,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
+import javax.print.Doc;
+import javax.print.DocFlavor;
+import javax.print.PrintService;
+import javax.print.PrintServiceLookup;
 import javax.swing.*;
 
 /**
@@ -201,24 +205,15 @@ public class Lector extends javax.swing.JFrame {
         Impresora = new javax.swing.JLayeredPane();
         cboImpresoras = new javax.swing.JComboBox();
         jLabel3 = new javax.swing.JLabel();
-        CmdEnviarTexto = new javax.swing.JButton();
-        jPanel1 = new javax.swing.JPanel();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
-        txtIP = new javax.swing.JTextField();
-        jLabel6 = new javax.swing.JLabel();
-        txtPort = new javax.swing.JTextField();
-        cmdImprimirNetwork = new javax.swing.JButton();
-        jLabel7 = new javax.swing.JLabel();
-        txtTextaImprimirNET = new javax.swing.JTextField();
         cmdRefreshPorts = new javax.swing.JButton();
         cmdPrueba2 = new javax.swing.JButton();
         cmdprueba3 = new javax.swing.JButton();
-        txtTextoImprimir = new javax.swing.JTextField();
+        txtImpresoraNombre = new javax.swing.JTextField();
         cmdTestComCPL = new javax.swing.JButton();
         cmdTestCom = new javax.swing.JButton();
         cmdTestLPT = new javax.swing.JButton();
         cmdTestLPTEPL = new javax.swing.JButton();
+        jLabel8 = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         mnuModoPrueba = new javax.swing.JMenuItem();
@@ -357,10 +352,7 @@ public class Lector extends javax.swing.JFrame {
                             .addComponent(cmdLeerBascula, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(cmdLeerHumedad, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(jLayeredPane1Layout.createSequentialGroup()
-                        .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jLayeredPane1Layout.createSequentialGroup()
-                                .addGap(44, 44, 44)
-                                .addComponent(cmdStartWebServer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(jLayeredPane1Layout.createSequentialGroup()
                                 .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(lblPuerto2)
@@ -368,7 +360,8 @@ public class Lector extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(cboBasculaPort, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(cboMHumedadPort, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                    .addComponent(cboMHumedadPort, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(cmdStartWebServer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(38, 38, 38)
                         .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(chk2Basculas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -406,9 +399,9 @@ public class Lector extends javax.swing.JFrame {
                         .addComponent(chkJustOne)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(CMDCerrar, javax.swing.GroupLayout.DEFAULT_SIZE, 48, Short.MAX_VALUE)
-                    .addComponent(cmdStartWebServer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
+                    .addComponent(CMDCerrar, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cmdStartWebServer, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         panelSensores.addTab("Sensores  Bascula y Humedad", jLayeredPane1);
@@ -416,97 +409,6 @@ public class Lector extends javax.swing.JFrame {
         cboImpresoras.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         jLabel3.setText("Impresora de Etiquetas");
-
-        CmdEnviarTexto.setText("Enviar comandos a la Impresora");
-        CmdEnviarTexto.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                CmdEnviarTextoActionPerformed(evt);
-            }
-        });
-
-        jLabel4.setText("Probando impresora via RED");
-
-        jLabel5.setText("IP ");
-
-        txtIP.setText("192.168.0.1");
-        txtIP.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtIPActionPerformed(evt);
-            }
-        });
-
-        jLabel6.setText("Port: ");
-
-        txtPort.setText("6101");
-
-        cmdImprimirNetwork.setText("IMPRIMIR");
-        cmdImprimirNetwork.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdImprimirNetworkActionPerformed(evt);
-            }
-        });
-
-        jLabel7.setText("Texto a enviar");
-
-        txtTextaImprimirNET.setText("Probando");
-        txtTextaImprimirNET.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtTextaImprimirNETActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel5)
-                                .addGap(32, 32, 32)
-                                .addComponent(txtIP))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel7)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(txtTextaImprimirNET, javax.swing.GroupLayout.PREFERRED_SIZE, 256, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(5, 5, 5)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabel6)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(txtPort, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 6, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 33, Short.MAX_VALUE)
-                                .addComponent(cmdImprimirNetwork, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addContainerGap())
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel4)
-                        .addGap(0, 0, Short.MAX_VALUE))))
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel4)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtIP)
-                    .addComponent(jLabel6)
-                    .addComponent(txtPort, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(cmdImprimirNetwork, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtTextaImprimirNET, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel7))
-                .addContainerGap())
-        );
 
         cmdRefreshPorts.setText("Buscar Ports");
         cmdRefreshPorts.addActionListener(new java.awt.event.ActionListener() {
@@ -529,10 +431,10 @@ public class Lector extends javax.swing.JFrame {
             }
         });
 
-        txtTextoImprimir.setText("Texto");
-        txtTextoImprimir.addActionListener(new java.awt.event.ActionListener() {
+        txtImpresoraNombre.setText("Escriba Noombre impresora");
+        txtImpresoraNombre.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtTextoImprimirActionPerformed(evt);
+                txtImpresoraNombreActionPerformed(evt);
             }
         });
 
@@ -551,6 +453,7 @@ public class Lector extends javax.swing.JFrame {
         });
 
         cmdTestLPT.setText("Test LPT");
+        cmdTestLPT.setEnabled(false);
         cmdTestLPT.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cmdTestLPTActionPerformed(evt);
@@ -558,58 +461,56 @@ public class Lector extends javax.swing.JFrame {
         });
 
         cmdTestLPTEPL.setText("Test LPT-EPL");
+        cmdTestLPTEPL.setEnabled(false);
         cmdTestLPTEPL.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cmdTestLPTEPLActionPerformed(evt);
             }
         });
 
+        jLabel8.setText("Nombre Impresora");
+
         Impresora.setLayer(cboImpresoras, javax.swing.JLayeredPane.DEFAULT_LAYER);
         Impresora.setLayer(jLabel3, javax.swing.JLayeredPane.DEFAULT_LAYER);
-        Impresora.setLayer(CmdEnviarTexto, javax.swing.JLayeredPane.DEFAULT_LAYER);
-        Impresora.setLayer(jPanel1, javax.swing.JLayeredPane.DEFAULT_LAYER);
         Impresora.setLayer(cmdRefreshPorts, javax.swing.JLayeredPane.DEFAULT_LAYER);
         Impresora.setLayer(cmdPrueba2, javax.swing.JLayeredPane.DEFAULT_LAYER);
         Impresora.setLayer(cmdprueba3, javax.swing.JLayeredPane.DEFAULT_LAYER);
-        Impresora.setLayer(txtTextoImprimir, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        Impresora.setLayer(txtImpresoraNombre, javax.swing.JLayeredPane.DEFAULT_LAYER);
         Impresora.setLayer(cmdTestComCPL, javax.swing.JLayeredPane.DEFAULT_LAYER);
         Impresora.setLayer(cmdTestCom, javax.swing.JLayeredPane.DEFAULT_LAYER);
         Impresora.setLayer(cmdTestLPT, javax.swing.JLayeredPane.DEFAULT_LAYER);
         Impresora.setLayer(cmdTestLPTEPL, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        Impresora.setLayer(jLabel8, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
         javax.swing.GroupLayout ImpresoraLayout = new javax.swing.GroupLayout(Impresora);
         Impresora.setLayout(ImpresoraLayout);
         ImpresoraLayout.setHorizontalGroup(
             ImpresoraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(ImpresoraLayout.createSequentialGroup()
+                .addGap(21, 21, 21)
                 .addGroup(ImpresoraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(ImpresoraLayout.createSequentialGroup()
-                        .addGap(21, 21, 21)
+                        .addComponent(cmdTestLPT, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(cmdprueba3, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(ImpresoraLayout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(cboImpresoras, javax.swing.GroupLayout.PREFERRED_SIZE, 187, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(cmdRefreshPorts, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(ImpresoraLayout.createSequentialGroup()
                         .addGroup(ImpresoraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtImpresoraNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 248, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(ImpresoraLayout.createSequentialGroup()
-                                .addComponent(cmdTestLPT, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(cmdprueba3, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(ImpresoraLayout.createSequentialGroup()
-                                .addComponent(jLabel3)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(cboImpresoras, javax.swing.GroupLayout.PREFERRED_SIZE, 187, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(cmdRefreshPorts, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(ImpresoraLayout.createSequentialGroup()
-                                .addGroup(ImpresoraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(txtTextoImprimir, javax.swing.GroupLayout.PREFERRED_SIZE, 248, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGroup(ImpresoraLayout.createSequentialGroup()
-                                        .addComponent(cmdTestComCPL, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(18, 18, 18)
-                                        .addGroup(ImpresoraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                            .addComponent(cmdTestLPTEPL, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                            .addComponent(cmdTestCom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 22, Short.MAX_VALUE)
-                                .addGroup(ImpresoraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(CmdEnviarTexto, javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(cmdPrueba2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE))))))
+                                .addComponent(cmdTestComCPL, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addGroup(ImpresoraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(cmdTestLPTEPL, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(cmdTestCom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addComponent(jLabel8))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 22, Short.MAX_VALUE)
+                        .addComponent(cmdPrueba2, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         ImpresoraLayout.setVerticalGroup(
@@ -620,10 +521,10 @@ public class Lector extends javax.swing.JFrame {
                     .addComponent(jLabel3)
                     .addComponent(cboImpresoras, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(cmdRefreshPorts))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(ImpresoraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtTextoImprimir)
-                    .addComponent(CmdEnviarTexto, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel8)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtImpresoraNombre)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(ImpresoraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cmdPrueba2)
@@ -634,9 +535,7 @@ public class Lector extends javax.swing.JFrame {
                     .addComponent(cmdprueba3)
                     .addComponent(cmdTestLPT)
                     .addComponent(cmdTestLPTEPL))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addGap(78, 78, 78))
         );
 
         panelSensores.addTab("Impresora", Impresora);
@@ -691,8 +590,7 @@ public class Lector extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblStatus)
-                    .addComponent(jLabel2))
-                .addContainerGap())
+                    .addComponent(jLabel2)))
         );
 
         lblStatus.getAccessibleContext().setAccessibleName("lblStatus");
@@ -704,23 +602,27 @@ public class Lector extends javax.swing.JFrame {
         mtdInicarServicioWebFromSWitchedBootn(this.cmdStartWebServer);
     }//GEN-LAST:event_cmdStartWebServer2ActionPerformed
 
-    private void txtTextoImprimirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtTextoImprimirActionPerformed
+    private void txtImpresoraNombreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtImpresoraNombreActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_txtTextoImprimirActionPerformed
+    }//GEN-LAST:event_txtImpresoraNombreActionPerformed
 
     private void cmdPrueba2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdPrueba2ActionPerformed
 
         try {
-            FileOutputStream os = new FileOutputStream(PuertoSerialMod.getPort(cboImpresoras).getSystemPortName());
-            JOptionPane.showMessageDialog(this, this, "Intentando imprimir usando nombre; " + PuertoSerialMod.getPort(cboImpresoras).getSystemPortName(),
-                    JOptionPane.INFORMATION_MESSAGE);
-            PrintStream ps = new PrintStream(os);
+            //FileOutputStream os = new FileOutputStream( txtImpresoraNombre.getText().trim() );
+            //JOptionPane.showMessageDialog( this, "Intentando imprimir en la impresora: nombre " + txtImpresoraNombre.getText().trim());
+            //PrintStream ps = new PrintStream(os);
             // EPL goes here
-            ps.println("^XA ^FO50,50^BY3^BCN,100,Y,N,N^FD>;382436>6CODE128>752375152^FS ^XZ");
-            ps.println("P1");
+            PrintService pservice = PrintServiceLookup.lookupDefaultPrintService();
+            if (pservice == null)
+                throw new Exception("No existen impresoras instaladas");
+            javax.print.DocPrintJob job = pservice.createPrintJob();
+            String commands = ("^XA ^FO50,50^BY3^BCN,100,Y,N,N^FD>;382436>6CODE128>752375152^FS ^XZ");
+            javax.print.DocFlavor flavor = javax.print.DocFlavor.BYTE_ARRAY.AUTOSENSE;
+            javax.print.Doc doc = new javax.print.SimpleDoc(commands.getBytes(), flavor, null);
+            job.print(doc, null);
+            
 
-            // flush buffer and close
-            ps.close();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, e.getMessage(), "Error a intentar imprimir puerto usando Puerto Name System.: ",
                     JOptionPane.ERROR_MESSAGE);
@@ -730,20 +632,36 @@ public class Lector extends javax.swing.JFrame {
 
     private void cmdTestComCPLActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdTestComCPLActionPerformed
         try {
-            ComCPL.test(PuertoSerialMod.getPort(cboImpresoras).getSystemPortName());
+            //ComCPL.test( txtImpresoraNombre.getText().trim() );
+            
+            PrintService pservice = PrintServiceLookup.lookupDefaultPrintService();
+            if (pservice == null)
+                throw new Exception("No existen impresoras instaladas");
+            javax.print.DocPrintJob job = pservice.createPrintJob();
+            String commands = "! 0 200 200 25 1 \n BARRA-SENSE \n TEXTO 5 1 0 5 Tech. Support \n FORMA  \n IMPRESORA";
+            javax.print.DocFlavor flavor = javax.print.DocFlavor.BYTE_ARRAY.AUTOSENSE;
+            javax.print.Doc doc = new javax.print.SimpleDoc(commands.getBytes(), flavor, null);
+            job.print(doc, null);
+            
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, e.getMessage(), "Error a intentar imprimir puerto usando Puerto Name System.: ",
                     JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_cmdTestComCPLActionPerformed
 
-    private void CmdEnviarTextoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CmdEnviarTextoActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_CmdEnviarTextoActionPerformed
-
     private void cmdTestComActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdTestComActionPerformed
         try {
-            ComTest.test(PuertoSerialMod.getPort(cboImpresoras).getSystemPortName());
+            //ComTest.test( txtImpresoraNombre.getText().trim() );
+            PrintService pservice = PrintServiceLookup.lookupDefaultPrintService();
+            if (pservice == null)
+                throw new Exception("No existen impresoras instaladas");
+            javax.print.DocPrintJob job = pservice.createPrintJob();
+            String commands = "^XA^FO50,50^A050,50^FDSoporte Tenicco GROUPHPSAP^FS^XZ";
+            javax.print.DocFlavor flavor = javax.print.DocFlavor.BYTE_ARRAY.AUTOSENSE;
+            javax.print.Doc doc = new javax.print.SimpleDoc(commands.getBytes(), flavor, null);
+            job.print(doc, null);
+            
+            
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, e.getMessage(), "Error a intentar imprimir puerto usando Puerto Name System.: ", JOptionPane.ERROR_MESSAGE);
         }
@@ -751,7 +669,7 @@ public class Lector extends javax.swing.JFrame {
 
     private void cmdTestLPTActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdTestLPTActionPerformed
         try {
-            Lpt.test(PuertoSerialMod.getPort(cboImpresoras).getSystemPortName());
+            Lpt.test( txtImpresoraNombre.getText().trim() );
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, e.getMessage(), "Error a intentar imprimir puerto usando Puerto Name System.: ", JOptionPane.ERROR_MESSAGE);
         }
@@ -759,7 +677,7 @@ public class Lector extends javax.swing.JFrame {
 
     private void cmdTestLPTEPLActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdTestLPTEPLActionPerformed
         try{   
-            ComCPL.test( PuertoSerialMod.getPort(cboImpresoras).getSystemPortName() );
+            ComCPL.test(txtImpresoraNombre.getText().trim() );
         }catch(Exception e){
             JOptionPane.showMessageDialog(this, e.getMessage(), "Error a intentar imprimir puerto usando Puerto Name System.: ", JOptionPane.ERROR_MESSAGE);
         }
@@ -771,13 +689,23 @@ public class Lector extends javax.swing.JFrame {
 
     private void cmdprueba3ActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_cmdprueba3ActionPerformed
         try {
+            
+            JOptionPane.showMessageDialog(this, "Intentando imprimir en la impresora por defecto");
+            //DocFlavor docFormat = DocFlavor.INPUT_STREAM.AUTOSENSE;
+            //Doc document = new SimpleDoc(inputStream, docFormat, null);
+ 
+            //PrintRequestAttributeSet attributeSet = new HashPrintRequestAttributeSet();
+ 
+            PrintService pservice = PrintServiceLookup.lookupDefaultPrintService();
+            if (pservice == null)
+                throw new Exception("No existen impresoras instaladas");
 
-            javax.print.PrintService pservice = null;
             javax.print.DocPrintJob job = pservice.createPrintJob();
             String commands = "^XA\n\r^MNM\n\r^FO050,50\n\r^B8N,100,Y,N\n\r^FD1234567\n\r^FS\n\r^PQ3\n\r^XZ";
             javax.print.DocFlavor flavor = javax.print.DocFlavor.BYTE_ARRAY.AUTOSENSE;
             javax.print.Doc doc = new javax.print.SimpleDoc(commands.getBytes(), flavor, null);
             job.print(doc, null);
+            
         } catch (java.lang.Exception e) {
             JOptionPane.showMessageDialog(this, e.getMessage(), "Error a intentar imprimir usando prinr service: ",
                     JOptionPane.ERROR_MESSAGE);
@@ -955,14 +883,12 @@ public class Lector extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton CMDCerrar;
-    private javax.swing.JButton CmdEnviarTexto;
     private javax.swing.JLayeredPane Impresora;
     private javax.swing.JComboBox cboBasculaPort;
     private javax.swing.JComboBox cboImpresoras;
     private javax.swing.JComboBox cboMHumedadPort;
     private javax.swing.JCheckBox chk2Basculas;
     private javax.swing.JCheckBox chkJustOne;
-    private javax.swing.JButton cmdImprimirNetwork;
     private javax.swing.JButton cmdLeerBascula;
     private javax.swing.JButton cmdLeerHumedad;
     private javax.swing.JButton cmdPrueba2;
@@ -979,10 +905,7 @@ public class Lector extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JLayeredPane jLayeredPane1;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
@@ -990,17 +913,13 @@ public class Lector extends javax.swing.JFrame {
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea lblLectura;
     private javax.swing.JLabel lblPuerto2;
     private javax.swing.JLabel lblStatus;
     private javax.swing.JMenuItem mnuModoPrueba;
     private javax.swing.JTabbedPane panelSensores;
-    private javax.swing.JTextField txtIP;
-    private javax.swing.JTextField txtPort;
-    private javax.swing.JTextField txtTextaImprimirNET;
-    private javax.swing.JTextField txtTextoImprimir;
+    private javax.swing.JTextField txtImpresoraNombre;
     // End of variables declaration//GEN-END:variables
 
     // carga todos los puertos existentes en los CBO
