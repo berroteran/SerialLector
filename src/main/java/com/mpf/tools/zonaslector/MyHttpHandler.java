@@ -21,11 +21,11 @@ public class MyHttpHandler implements HttpHandler {
 
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
-        String requestParamValue=null;
+        String requestParamValue = null;
 
-        if("GET".equals(httpExchange.getRequestMethod())) {
-            requestParamValue = handleGetRequest( httpExchange );
-        }else if("POST".equals(httpExchange)) {
+        if ("GET".equals(httpExchange.getRequestMethod())) {
+            requestParamValue = handleGetRequest(httpExchange);
+        } else if ("POST".equals(httpExchange)) {
             requestParamValue = handlePostRequest(httpExchange);
         }
         //
@@ -36,8 +36,8 @@ public class MyHttpHandler implements HttpHandler {
             httpExchange.sendResponseHeaders(204, -1);
             return;
         }
-        httpExchange.getResponseHeaders().add( HEADER_CONTENT_TYPE, String.format("application/json; charset=%s", CHARSET));
-        handleResponse(httpExchange,requestParamValue);
+        httpExchange.getResponseHeaders().add(HEADER_CONTENT_TYPE, String.format("application/json; charset=%s", CHARSET));
+        handleResponse(httpExchange, requestParamValue);
     }
 
     private String handlePostRequest(HttpExchange httpExchange) {
@@ -50,32 +50,32 @@ public class MyHttpHandler implements HttpHandler {
     }
 
     private String handleGetRequest(HttpExchange httpExchange) {
-        String par  = httpExchange.
-        getRequestURI()
+        String par = httpExchange.
+                getRequestURI()
                 .toString()
                 .split("\\?")[1]
                 .split("=")[1];
         String valor = "";
         System.out.println("valor parametro: " + par);
-        if ( par.equals("b")){
-            valor =  Lector.getBascula();
-        }else{
+        if (par.equals("b")) {
+            valor = Lector.getBascula();
+        } else {
             valor = Lector.getHumedad();
         }
         return valor;
     }
 
-    private void handleResponse(HttpExchange httpExchange, String requestParamValue)  throws  IOException {
+    private void handleResponse(HttpExchange httpExchange, String requestParamValue) throws IOException {
         requestParamValue = requestParamValue == null ? "" : requestParamValue;
         OutputStream outputStream = httpExchange.getResponseBody();
         StringBuilder htmlBuilder = new StringBuilder();
 
         String cadena = "{\"status\":\"OK\", \"data\" : [ ";
-            cadena += "{\"port1\":\"" + Lector.getBascula() + "\"} ";
+        cadena += "{\"port1\":\"" + Lector.getBascula() + "\"} ";
         cadena += ",";
-            cadena += "{\"port2\":\"" + Lector.getHumedad() + "\"} ";
-            cadena += "]}";
-        
+        cadena += "{\"port2\":\"" + Lector.getHumedad() + "\"} ";
+        cadena += "]}";
+
         htmlBuilder.append(cadena);
         // encode HTML content
         String htmlResponse = htmlBuilder.toString();

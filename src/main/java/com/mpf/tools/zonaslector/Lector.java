@@ -6,8 +6,8 @@
 package com.mpf.tools.zonaslector;
 
 import com.fazecast.jSerialComm.SerialPort;
+import com.mpf.tools.zonasimpresora.*;
 import com.sun.net.httpserver.HttpServer;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,10 +15,13 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,26 +29,24 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 
 /**
- *
  * @author berroteran
  */
 public class Lector extends javax.swing.JFrame {
 
-    //variables
-    SerialPort[] ports;
+    // variables
+    List<PuertoSerialMod> ports;
     TrayIcon trayIcon;
     SystemTray tray;
-    
 
-    //static
+    // static
     private static Boolean modoDeveloper = false;
     private static Lector MyInstance;
     private static String bascula = "";
     private static String humedad = "";
-    public static boolean leyendoPuerto1= false;
-    public static boolean leyendoPuerto2= false;
+    public static boolean leyendoPuerto1 = false;
+    public static boolean leyendoPuerto2 = false;
     public static HttpServer server = null;
-    
+
     /**
      * Creates new form Lector
      */
@@ -53,29 +54,29 @@ public class Lector extends javax.swing.JFrame {
         MyInstance = this;
         initComponents();
 
-        //set Iconos
+        // set Iconos
         cmdStartWebServer2.setIcon(
-                new javax.swing.ImageIcon( getClass().getClassLoader().getResource( "icons/network_service32.png" ) )
-        );
-        //loadVariable
-        ports = SerialPort.getCommPorts();
+                new javax.swing.ImageIcon(getClass().getClassLoader().getResource("icons/network_service32.png")));
+        // loadVariable
         getPortsToModel();
-        //
-        if(SystemTray.isSupported() ){
-            tray=SystemTray.getSystemTray();
 
-            Image image =Toolkit.getDefaultToolkit().getImage( (URL) getClass().getClassLoader().getResource("icons/iconobascula.png") );
-            ActionListener exitListener=new ActionListener() {
+        //
+        if (SystemTray.isSupported()) {
+            tray = SystemTray.getSystemTray();
+
+            Image image = Toolkit.getDefaultToolkit()
+                    .getImage((URL) getClass().getClassLoader().getResource("icons/iconobascula.png"));
+            ActionListener exitListener = new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     System.exit(0);
                 }
             };
-            PopupMenu popup=new PopupMenu();
+            PopupMenu popup = new PopupMenu();
             MenuItem defaultItem = new MenuItem("Salir");
             defaultItem.addActionListener(exitListener);
             popup.add(defaultItem);
 
-            popup.add(new MenuItem("-") );
+            popup.add(new MenuItem("-"));
             defaultItem = new MenuItem("Mostrar");
             defaultItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -85,15 +86,15 @@ public class Lector extends javax.swing.JFrame {
             });
             popup.add(defaultItem);
 
-            trayIcon=new TrayIcon( image , "Sensor de bascula y medidor de Humedad.", popup);
+            trayIcon = new TrayIcon(image, "Sensor de bascula y medidor de Humedad.", popup);
             trayIcon.setImageAutoSize(true);
-        }else{
+        } else {
             System.out.println("Este sistema no soporta ocultar la  aplicacion en el SysTray");
         }
 
         addWindowStateListener(new WindowStateListener() {
             public void windowStateChanged(WindowEvent e) {
-                if(e.getNewState()==ICONIFIED){
+                if (e.getNewState() == ICONIFIED) {
                     try {
                         tray.add(trayIcon);
                         setVisible(false);
@@ -102,69 +103,69 @@ public class Lector extends javax.swing.JFrame {
                         System.out.println("unable to add to tray");
                     }
                 }
-                if(e.getNewState()==7){
-                    try{
+                if (e.getNewState() == 7) {
+                    try {
                         tray.add(trayIcon);
                         setVisible(false);
                         System.out.println("added to SystemTray");
-                    }catch(AWTException ex){
+                    } catch (AWTException ex) {
                         System.out.println("unable to add to system tray");
                     }
                 }
-                if(e.getNewState()==MAXIMIZED_BOTH){
+                if (e.getNewState() == MAXIMIZED_BOTH) {
                     tray.remove(trayIcon);
                     setVisible(true);
                     System.out.println("Tray icon removed");
                 }
-                if(e.getNewState()==NORMAL){
+                if (e.getNewState() == NORMAL) {
                     tray.remove(trayIcon);
                     setVisible(true);
                     System.out.println("Tray icon removed");
                 }
             }
         });
-        //set icono
-        //setIconImage(Toolkit.getDefaultToolkit().getImage(""));
-        //this.setIconImage(new ImageIcon(getClass().getResource("/icons/iconobascula.png")).getImage());
+        // set icono
+        // setIconImage(Toolkit.getDefaultToolkit().getImage(""));
+        // this.setIconImage(new
+        // ImageIcon(getClass().getResource("/icons/iconobascula.png")).getImage());
 
-
-        //cerrar oon exit.
-        //setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
+        // cerrar oon exit.
+        // setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
     public static String getBascula() {
-        if ( modoDeveloper ){
-            System.out.println("Modo Desarrollo" );
-            return "21.03";   
-        }else{ 
-        System.out.println("Antes de limpiar: " + bascula );
-        String value = bascula.trim().replaceAll("[^\\d.]", "");
-        if ( value.length() > 10 )
-            value=value.substring(0,10);
-        if ( value.equals("") )
-            value = "0";
-        return value;
+        if (modoDeveloper) {
+            System.out.println("Modo Desarrollo");
+            return "21.03";
+        } else {
+            System.out.println("Antes de limpiar: " + bascula);
+            String value = bascula.trim().replaceAll("[^\\d.]", "");
+            if (value.length() > 10) {
+                value = value.substring(0, 10);
+            }
+            if (value.equals("")) {
+                value = "0";
+            }
+            return value;
         }
     }
 
     public static String getHumedad() {
-        if ( modoDeveloper ){
+        if (modoDeveloper) {
             System.out.println("Modo desarrollo: 03.");
-            return "03.21";   
-        }else{ 
-        System.out.println("Antes de limpiar: " + humedad );
-        String value = humedad.trim().replaceAll("[^\\d.]", "");
-        if ( value.length() > 10 )
-            value=value.substring(0,10);
-        if ( value.equals("") )
-            value = "0.0";
-        return value;
+            return "4.21";
+        } else {
+            System.out.println("Valor de Humedad retornado from Humedad.");
+            return humedad;
         }
     }
 
     public static void setBascula(String s) {
-        bascula=s;
+        bascula = s;
+    }
+
+    public static void setHumedad(String v) {
+        humedad = v;
     }
 
     /**
@@ -173,25 +174,51 @@ public class Lector extends javax.swing.JFrame {
      * regenerated by the Form Editor.
      */
     @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated
+    // <editor-fold defaultstate="collapsed" desc="Generated
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jDialog1 = new javax.swing.JDialog();
+        lblStatus = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        panelSensores = new javax.swing.JTabbedPane();
+        jLayeredPane1 = new javax.swing.JLayeredPane();
+        cmdLeerHumedad = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         lblLectura = new javax.swing.JTextArea();
         cmdLeerBascula = new javax.swing.JButton();
+        cmdStartWebServer2 = new javax.swing.JToggleButton();
+        chk2Basculas = new javax.swing.JCheckBox();
+        cboBasculaPort = new javax.swing.JComboBox();
         jLabel1 = new javax.swing.JLabel();
-        cboBasculaPort = new javax.swing.JComboBox<>();
-        lblStatus = new javax.swing.JLabel();
+        cboMHumedadPort = new javax.swing.JComboBox();
         lblPuerto2 = new javax.swing.JLabel();
-        cboMHumedadPort = new javax.swing.JComboBox<>();
         cmdReloadPorts = new javax.swing.JButton();
         cmdStartWebServer = new javax.swing.JButton();
-        cmdLeerHumedad = new javax.swing.JButton();
         CMDCerrar = new javax.swing.JButton();
         chkJustOne = new javax.swing.JCheckBox();
-        jLabel2 = new javax.swing.JLabel();
-        chk2Basculas = new javax.swing.JCheckBox();
-        cmdStartWebServer2 = new javax.swing.JToggleButton();
+        Impresora = new javax.swing.JLayeredPane();
+        cboImpresoras = new javax.swing.JComboBox();
+        jLabel3 = new javax.swing.JLabel();
+        CmdEnviarTexto = new javax.swing.JButton();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        txtIP = new javax.swing.JTextField();
+        jLabel6 = new javax.swing.JLabel();
+        txtPort = new javax.swing.JTextField();
+        cmdImprimirNetwork = new javax.swing.JButton();
+        jLabel7 = new javax.swing.JLabel();
+        txtTextaImprimirNET = new javax.swing.JTextField();
+        cmdRefreshPorts = new javax.swing.JButton();
+        cmdPrueba2 = new javax.swing.JButton();
+        cmdprueba3 = new javax.swing.JButton();
+        txtTextoImprimir = new javax.swing.JTextField();
+        cmdTestComCPL = new javax.swing.JButton();
+        cmdTestCom = new javax.swing.JButton();
+        cmdTestLPT = new javax.swing.JButton();
+        cmdTestLPTEPL = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         mnuModoPrueba = new javax.swing.JMenuItem();
@@ -200,10 +227,37 @@ public class Lector extends javax.swing.JFrame {
         jMenu3 = new javax.swing.JMenu();
         jMenuItem3 = new javax.swing.JMenuItem();
 
+        javax.swing.GroupLayout jDialog1Layout = new javax.swing.GroupLayout(jDialog1.getContentPane());
+        jDialog1.getContentPane().setLayout(jDialog1Layout);
+        jDialog1Layout.setHorizontalGroup(
+            jDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 400, Short.MAX_VALUE)
+        );
+        jDialog1Layout.setVerticalGroup(
+            jDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 300, Short.MAX_VALUE)
+        );
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Lector de Sensores");
         setIconImage(getIconImage());
         setResizable(false);
+
+        lblStatus.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lblStatus.setText("///");
+        lblStatus.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        lblStatus.setName("lblStatus"); // NOI18N
+
+        jLabel2.setText("Ver 0.8.21");
+
+        panelSensores.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+
+        cmdLeerHumedad.setText("Leer Humedad");
+        cmdLeerHumedad.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdLeerHumedadActionPerformed(evt);
+            }
+        });
 
         lblLectura.setEditable(false);
         lblLectura.setColumns(60);
@@ -221,18 +275,27 @@ public class Lector extends javax.swing.JFrame {
             }
         });
 
-        jLabel1.setText("Puerto  Balanza");
+        cmdStartWebServer2.setText("Iniciar Servicio");
+        cmdStartWebServer2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdStartWebServer2ActionPerformed(evt);
+            }
+        });
+
+        chk2Basculas.setText("Usar 2 Basculas");
+        chk2Basculas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chk2BasculasActionPerformed(evt);
+            }
+        });
 
         cboBasculaPort.setName("cboBasculaPort"); // NOI18N
 
-        lblStatus.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        lblStatus.setText("///");
-        lblStatus.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        lblStatus.setName("lblStatus"); // NOI18N
-
-        lblPuerto2.setText("Puerto M. Humedad");
+        jLabel1.setText("Puerto  Balanza");
 
         cboMHumedadPort.setName("cboPorts"); // NOI18N
+
+        lblPuerto2.setText("Puerto M. Humedad");
 
         cmdReloadPorts.setText("Refrescar  Puertos");
         cmdReloadPorts.addActionListener(new java.awt.event.ActionListener() {
@@ -246,13 +309,6 @@ public class Lector extends javax.swing.JFrame {
         cmdStartWebServer.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cmdStartWebServerActionPerformed(evt);
-            }
-        });
-
-        cmdLeerHumedad.setText("Leer Humedad");
-        cmdLeerHumedad.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdLeerHumedadActionPerformed(evt);
             }
         });
 
@@ -270,21 +326,320 @@ public class Lector extends javax.swing.JFrame {
             }
         });
 
-        jLabel2.setText("Ver 0.8.21");
+        jLayeredPane1.setLayer(cmdLeerHumedad, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        jLayeredPane1.setLayer(jScrollPane1, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        jLayeredPane1.setLayer(cmdLeerBascula, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        jLayeredPane1.setLayer(cmdStartWebServer2, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        jLayeredPane1.setLayer(chk2Basculas, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        jLayeredPane1.setLayer(cboBasculaPort, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        jLayeredPane1.setLayer(jLabel1, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        jLayeredPane1.setLayer(cboMHumedadPort, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        jLayeredPane1.setLayer(lblPuerto2, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        jLayeredPane1.setLayer(cmdReloadPorts, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        jLayeredPane1.setLayer(cmdStartWebServer, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        jLayeredPane1.setLayer(CMDCerrar, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        jLayeredPane1.setLayer(chkJustOne, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
-        chk2Basculas.setText("Usar 2 Basculas");
-        chk2Basculas.addActionListener(new java.awt.event.ActionListener() {
+        javax.swing.GroupLayout jLayeredPane1Layout = new javax.swing.GroupLayout(jLayeredPane1);
+        jLayeredPane1.setLayout(jLayeredPane1Layout);
+        jLayeredPane1Layout.setHorizontalGroup(
+            jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jLayeredPane1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jLayeredPane1Layout.createSequentialGroup()
+                        .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(cmdReloadPorts, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 301, Short.MAX_VALUE)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                        .addGap(18, 18, 18)
+                        .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(cmdStartWebServer2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(cmdLeerBascula, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(cmdLeerHumedad, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(jLayeredPane1Layout.createSequentialGroup()
+                        .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jLayeredPane1Layout.createSequentialGroup()
+                                .addGap(44, 44, 44)
+                                .addComponent(cmdStartWebServer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(jLayeredPane1Layout.createSequentialGroup()
+                                .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(lblPuerto2)
+                                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(cboBasculaPort, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(cboMHumedadPort, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGap(38, 38, 38)
+                        .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(chk2Basculas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(chkJustOne, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
+                            .addGroup(jLayeredPane1Layout.createSequentialGroup()
+                                .addComponent(CMDCerrar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addContainerGap())))))
+        );
+        jLayeredPane1Layout.setVerticalGroup(
+            jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jLayeredPane1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jLayeredPane1Layout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cmdReloadPorts, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(7, 7, 7)
+                        .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel1)
+                            .addComponent(cboBasculaPort, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(cboMHumedadPort, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblPuerto2)))
+                    .addGroup(jLayeredPane1Layout.createSequentialGroup()
+                        .addComponent(cmdLeerBascula, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cmdLeerHumedad, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cmdStartWebServer2, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(chk2Basculas)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkJustOne)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(CMDCerrar, javax.swing.GroupLayout.DEFAULT_SIZE, 48, Short.MAX_VALUE)
+                    .addComponent(cmdStartWebServer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+
+        panelSensores.addTab("Sensores  Bascula y Humedad", jLayeredPane1);
+
+        cboImpresoras.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        jLabel3.setText("Impresora de Etiquetas");
+
+        CmdEnviarTexto.setText("Enviar comandos a la Impresora");
+        CmdEnviarTexto.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chk2BasculasActionPerformed(evt);
+                CmdEnviarTextoActionPerformed(evt);
             }
         });
 
-        cmdStartWebServer2.setText("Iniciar Servicio");
-        cmdStartWebServer2.addActionListener(new java.awt.event.ActionListener() {
+        jLabel4.setText("Probando impresora via RED");
+
+        jLabel5.setText("IP ");
+
+        txtIP.setText("192.168.0.1");
+        txtIP.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdStartWebServer2ActionPerformed(evt);
+                txtIPActionPerformed(evt);
             }
         });
+
+        jLabel6.setText("Port: ");
+
+        txtPort.setText("6101");
+
+        cmdImprimirNetwork.setText("IMPRIMIR");
+        cmdImprimirNetwork.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdImprimirNetworkActionPerformed(evt);
+            }
+        });
+
+        jLabel7.setText("Texto a enviar");
+
+        txtTextaImprimirNET.setText("Probando");
+        txtTextaImprimirNET.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtTextaImprimirNETActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(6, 6, 6)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel5)
+                                .addGap(32, 32, 32)
+                                .addComponent(txtIP))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel7)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(txtTextaImprimirNET, javax.swing.GroupLayout.PREFERRED_SIZE, 256, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(5, 5, 5)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabel6)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(txtPort, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 6, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 33, Short.MAX_VALUE)
+                                .addComponent(cmdImprimirNetwork, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addContainerGap())
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel4)
+                        .addGap(0, 0, Short.MAX_VALUE))))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel4)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtIP)
+                    .addComponent(jLabel6)
+                    .addComponent(txtPort, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(cmdImprimirNetwork, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtTextaImprimirNET, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel7))
+                .addContainerGap())
+        );
+
+        cmdRefreshPorts.setText("Buscar Ports");
+        cmdRefreshPorts.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdRefreshPortsActionPerformed(evt);
+            }
+        });
+
+        cmdPrueba2.setText("Prueba2 (BarCODE)");
+        cmdPrueba2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdPrueba2ActionPerformed(evt);
+            }
+        });
+
+        cmdprueba3.setText("Prueba tipo3 (PrintServer)");
+        cmdprueba3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdprueba3ActionPerformed(evt);
+            }
+        });
+
+        txtTextoImprimir.setText("Texto");
+        txtTextoImprimir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtTextoImprimirActionPerformed(evt);
+            }
+        });
+
+        cmdTestComCPL.setText("TestComCPL");
+        cmdTestComCPL.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdTestComCPLActionPerformed(evt);
+            }
+        });
+
+        cmdTestCom.setText("Test Com");
+        cmdTestCom.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdTestComActionPerformed(evt);
+            }
+        });
+
+        cmdTestLPT.setText("Test LPT");
+        cmdTestLPT.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdTestLPTActionPerformed(evt);
+            }
+        });
+
+        cmdTestLPTEPL.setText("Test LPT-EPL");
+        cmdTestLPTEPL.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdTestLPTEPLActionPerformed(evt);
+            }
+        });
+
+        Impresora.setLayer(cboImpresoras, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        Impresora.setLayer(jLabel3, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        Impresora.setLayer(CmdEnviarTexto, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        Impresora.setLayer(jPanel1, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        Impresora.setLayer(cmdRefreshPorts, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        Impresora.setLayer(cmdPrueba2, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        Impresora.setLayer(cmdprueba3, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        Impresora.setLayer(txtTextoImprimir, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        Impresora.setLayer(cmdTestComCPL, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        Impresora.setLayer(cmdTestCom, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        Impresora.setLayer(cmdTestLPT, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        Impresora.setLayer(cmdTestLPTEPL, javax.swing.JLayeredPane.DEFAULT_LAYER);
+
+        javax.swing.GroupLayout ImpresoraLayout = new javax.swing.GroupLayout(Impresora);
+        Impresora.setLayout(ImpresoraLayout);
+        ImpresoraLayout.setHorizontalGroup(
+            ImpresoraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(ImpresoraLayout.createSequentialGroup()
+                .addGroup(ImpresoraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(ImpresoraLayout.createSequentialGroup()
+                        .addGap(21, 21, 21)
+                        .addGroup(ImpresoraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(ImpresoraLayout.createSequentialGroup()
+                                .addComponent(cmdTestLPT, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(cmdprueba3, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(ImpresoraLayout.createSequentialGroup()
+                                .addComponent(jLabel3)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(cboImpresoras, javax.swing.GroupLayout.PREFERRED_SIZE, 187, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(cmdRefreshPorts, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(ImpresoraLayout.createSequentialGroup()
+                                .addGroup(ImpresoraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtTextoImprimir, javax.swing.GroupLayout.PREFERRED_SIZE, 248, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(ImpresoraLayout.createSequentialGroup()
+                                        .addComponent(cmdTestComCPL, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(18, 18, 18)
+                                        .addGroup(ImpresoraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                            .addComponent(cmdTestLPTEPL, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                            .addComponent(cmdTestCom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 22, Short.MAX_VALUE)
+                                .addGroup(ImpresoraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(CmdEnviarTexto, javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(cmdPrueba2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE))))))
+                .addContainerGap())
+        );
+        ImpresoraLayout.setVerticalGroup(
+            ImpresoraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(ImpresoraLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(ImpresoraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(cboImpresoras, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cmdRefreshPorts))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(ImpresoraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtTextoImprimir)
+                    .addComponent(CmdEnviarTexto, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(ImpresoraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(cmdPrueba2)
+                    .addComponent(cmdTestComCPL)
+                    .addComponent(cmdTestCom))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(ImpresoraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(cmdprueba3)
+                    .addComponent(cmdTestLPT)
+                    .addComponent(cmdTestLPTEPL))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+
+        panelSensores.addTab("Impresora", Impresora);
 
         jMenu1.setText("File");
 
@@ -320,74 +675,19 @@ public class Lector extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(cmdReloadPorts, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(70, 70, 70)
-                                .addComponent(cmdStartWebServer, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(CMDCerrar, javax.swing.GroupLayout.DEFAULT_SIZE, 91, Short.MAX_VALUE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                        .addComponent(cmdLeerBascula, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(cmdLeerHumedad, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                    .addComponent(cmdStartWebServer2, javax.swing.GroupLayout.Alignment.TRAILING)))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(cboBasculaPort, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(lblPuerto2)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(cboMHumedadPort, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                .addGap(18, 18, 18)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(chkJustOne, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(chk2Basculas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
-                    .addGroup(layout.createSequentialGroup()
                         .addComponent(lblStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 375, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(panelSensores)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(cmdLeerBascula, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cmdLeerHumedad, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(cmdStartWebServer2))
-                    .addComponent(jScrollPane1))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel1)
-                            .addComponent(cboBasculaPort, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(chk2Basculas)
-                        .addGap(9, 9, 9)))
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(cboMHumedadPort, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblPuerto2)
-                    .addComponent(chkJustOne))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(cmdReloadPorts, javax.swing.GroupLayout.DEFAULT_SIZE, 28, Short.MAX_VALUE)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(CMDCerrar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(cmdStartWebServer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addComponent(panelSensores)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblStatus)
@@ -400,14 +700,99 @@ public class Lector extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void cmdStartWebServer2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdStartWebServer2ActionPerformed
+        mtdInicarServicioWebFromSWitchedBootn(this.cmdStartWebServer);
+    }//GEN-LAST:event_cmdStartWebServer2ActionPerformed
 
-    private void cmdLeerBasculaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdLeerBasculaActionPerformed
+    private void txtTextoImprimirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtTextoImprimirActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtTextoImprimirActionPerformed
+
+    private void cmdPrueba2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdPrueba2ActionPerformed
 
         try {
-            if ( server == null ){
+            FileOutputStream os = new FileOutputStream(PuertoSerialMod.getPort(cboImpresoras).getSystemPortName());
+            JOptionPane.showMessageDialog(this, this, "Intentando imprimir usando nombre; " + PuertoSerialMod.getPort(cboImpresoras).getSystemPortName(),
+                    JOptionPane.INFORMATION_MESSAGE);
+            PrintStream ps = new PrintStream(os);
+            // EPL goes here
+            ps.println("^XA ^FO50,50^BY3^BCN,100,Y,N,N^FD>;382436>6CODE128>752375152^FS ^XZ");
+            ps.println("P1");
+
+            // flush buffer and close
+            ps.close();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error a intentar imprimir puerto usando Puerto Name System.: ",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+
+    }//GEN-LAST:event_cmdPrueba2ActionPerformed
+
+    private void cmdTestComCPLActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdTestComCPLActionPerformed
+        try {
+            ComCPL.test(PuertoSerialMod.getPort(cboImpresoras).getSystemPortName());
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error a intentar imprimir puerto usando Puerto Name System.: ",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_cmdTestComCPLActionPerformed
+
+    private void CmdEnviarTextoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CmdEnviarTextoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_CmdEnviarTextoActionPerformed
+
+    private void cmdTestComActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdTestComActionPerformed
+        try {
+            ComTest.test(PuertoSerialMod.getPort(cboImpresoras).getSystemPortName());
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error a intentar imprimir puerto usando Puerto Name System.: ", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_cmdTestComActionPerformed
+
+    private void cmdTestLPTActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdTestLPTActionPerformed
+        try {
+            Lpt.test(PuertoSerialMod.getPort(cboImpresoras).getSystemPortName());
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error a intentar imprimir puerto usando Puerto Name System.: ", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_cmdTestLPTActionPerformed
+
+    private void cmdTestLPTEPLActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdTestLPTEPLActionPerformed
+        try{   
+            ComCPL.test( PuertoSerialMod.getPort(cboImpresoras).getSystemPortName() );
+        }catch(Exception e){
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error a intentar imprimir puerto usando Puerto Name System.: ", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_cmdTestLPTEPLActionPerformed
+
+    private void cmdRefreshPortsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdRefreshPortsActionPerformed
+        getPortsToModel();
+    }//GEN-LAST:event_cmdRefreshPortsActionPerformed
+
+    private void cmdprueba3ActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_cmdprueba3ActionPerformed
+        try {
+
+            javax.print.PrintService pservice = null;
+            javax.print.DocPrintJob job = pservice.createPrintJob();
+            String commands = "^XA\n\r^MNM\n\r^FO050,50\n\r^B8N,100,Y,N\n\r^FD1234567\n\r^FS\n\r^PQ3\n\r^XZ";
+            javax.print.DocFlavor flavor = javax.print.DocFlavor.BYTE_ARRAY.AUTOSENSE;
+            javax.print.Doc doc = new javax.print.SimpleDoc(commands.getBytes(), flavor, null);
+            job.print(doc, null);
+        } catch (java.lang.Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error a intentar imprimir usando prinr service: ",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }// GEN-LAST:event_cmdprueba3ActionPerformed
+
+    private void cmdLeerBasculaActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_cmdLeerBasculaActionPerformed
+
+        try {
+            if (server == null) {
                 System.out.println("Lectura manual");
-                Lector.getLector().setText( ReadPortsBascula.readBasculaPort( (SerialPort) cboBasculaPort.getSelectedItem() ) );
-            }else {
+                Lector.getLector().setText(
+                        ReadPortsBascula.readBasculaPort(PuertoSerialMod.getPort(cboBasculaPort))
+                );
+            } else {
                 System.out.println("Leyendo desde hilo/servidor");
                 System.out.println("Puerto 01 is:" + leyendoPuerto1);
                 iniciarLeerPuertoB01();
@@ -416,109 +801,124 @@ public class Lector extends javax.swing.JFrame {
                 Lector.getLector().setText(Lector.getBascula());
             }
         } catch (Exception e) {
-            ((SerialPort) cboBasculaPort.getSelectedItem()).closePort();
-            JOptionPane.showMessageDialog(this, e.getMessage(),"Error a intentar leer el puerto01",JOptionPane.ERROR_MESSAGE);
-        }finally {
+            ((PuertoSerialMod) cboBasculaPort.getSelectedItem()).getPuerto().closePort();
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error a intentar leer el puerto01",
+                    JOptionPane.ERROR_MESSAGE);
+        } finally {
 
         }
 
-    }//GEN-LAST:event_cmdLeerBasculaActionPerformed
+    }// GEN-LAST:event_cmdLeerBasculaActionPerformed
 
-
-    private void cmdReloadPortsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdReloadPortsActionPerformed
+    private void cmdReloadPortsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_cmdReloadPortsActionPerformed
         getPortsToModel();
-    }//GEN-LAST:event_cmdReloadPortsActionPerformed
+    }// GEN-LAST:event_cmdReloadPortsActionPerformed
 
-    private void cmdLeerHumedadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdLeerHumedadActionPerformed
+    private void cmdLeerHumedadActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_cmdLeerHumedadActionPerformed
         try {
-            if ( server == null ){
-                if ( chk2Basculas.isSelected() )
-                    Lector.getLector().setText( ReadPortsBascula.readBasculaPort( (SerialPort) cboMHumedadPort.getSelectedItem() ) );
-                else
-                    Lector.getLector().setText( ReadPortsHumedad.readMHumedadPort((SerialPort) cboMHumedadPort.getSelectedItem() ) );
-            }else {
+            if (server == null) {
+                if (chk2Basculas.isSelected()) {
+                    Lector.getLector()
+                            .setText(ReadPortsBascula.readBasculaPort(PuertoSerialMod.getPort(cboMHumedadPort)));
+                } else {
+                    Lector.getLector()
+                            .setText(ReadPortsHumedad.readMHumedadPort(PuertoSerialMod.getPort(cboMHumedadPort)));
+                }
+            } else {
                 System.out.println("Puerto 02 is:" + leyendoPuerto2);
                 iniciarLeerPuertoMHumedad();
                 TimeUnit.MILLISECONDS.sleep(300);
             }
         } catch (Exception e) {
-            lblStatus.setText( "** " + e.getMessage() );
-            JOptionPane.showMessageDialog(this, e.getMessage(),"Error a intentar leer el puerto02 M. de Humedad.",JOptionPane.ERROR_MESSAGE);
+            lblStatus.setText("** " + e.getMessage());
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error a intentar leer el puerto02 M. de Humedad.",
+                    JOptionPane.ERROR_MESSAGE);
         }
         System.out.println("Puerto 02 is:" + leyendoPuerto2);
         Lector.getLector().setText(Lector.getBascula());
 
-    }//GEN-LAST:event_cmdLeerHumedadActionPerformed
+    }// GEN-LAST:event_cmdLeerHumedadActionPerformed
 
-    private void CMDCerrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CMDCerrarActionPerformed
+    private void CMDCerrarActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_CMDCerrarActionPerformed
         System.exit(0);
-    }//GEN-LAST:event_CMDCerrarActionPerformed
+    }// GEN-LAST:event_CMDCerrarActionPerformed
 
-    private void cmdStartWebServerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdStartWebServerActionPerformed
-           iniciarServicio();
-    }//GEN-LAST:event_cmdStartWebServerActionPerformed
-
-    private void chkJustOneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkJustOneActionPerformed
-        cboMHumedadPort.setEnabled( !chkJustOne.isSelected());
-        chk2Basculas.setSelected(false);
-        cmdLeerHumedad.setEnabled( !chkJustOne.isSelected() );
-        if ( chkJustOne.isSelected() ){
-            
-        }else{ 
-        
+    private void cmdStartWebServerActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_cmdStartWebServerActionPerformed
+        try {
+            iniciarServicio();
+        } catch (Exception e) {
+            e.printStackTrace();
+            cmdStartWebServer2.setSelected(false);
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error Al iniciar Servicio", JOptionPane.ERROR_MESSAGE);
         }
-    }//GEN-LAST:event_chkJustOneActionPerformed
+    }// GEN-LAST:event_cmdStartWebServerActionPerformed
 
-    private void mnuModoPruebaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuModoPruebaActionPerformed
-        try{
+    private void chkJustOneActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_chkJustOneActionPerformed
+        cboMHumedadPort.setEnabled(!chkJustOne.isSelected());
+        chk2Basculas.setSelected(false);
+        cmdLeerHumedad.setEnabled(!chkJustOne.isSelected());
+        if (chkJustOne.isSelected()) {
+
+        } else {
+
+        }
+    }// GEN-LAST:event_chkJustOneActionPerformed
+
+    private void mnuModoPruebaActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_mnuModoPruebaActionPerformed
+        try {
             iniciarServicioModoDesarroll();
             cmdStartWebServer.setEnabled(false);
             cmdStartWebServer2.setSelected(true);
 
-        }catch(Exception e){
-            JOptionPane.showMessageDialog(this, e.getMessage(),"Error Al iniciar Servicio en Modo desarrollo",JOptionPane.ERROR_MESSAGE);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error Al iniciar Servicio en Modo desarrollo",
+                    JOptionPane.ERROR_MESSAGE);
         }
-    }//GEN-LAST:event_mnuModoPruebaActionPerformed
+    }// GEN-LAST:event_mnuModoPruebaActionPerformed
 
-    private void chk2BasculasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chk2BasculasActionPerformed
-       if ( chk2Basculas.isSelected() ){
+    private void chk2BasculasActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_chk2BasculasActionPerformed
+        if (chk2Basculas.isSelected()) {
             chkJustOne.setSelected(false);
             lblPuerto2.setText("Bascula 2.");
             cmdLeerHumedad.setText("Leer 2da Bascula");
-       }else{
+        } else {
             chkJustOne.setSelected(false);
             lblPuerto2.setText("M. de Humedad");
             cmdLeerHumedad.setText("Leer M. de Humedad");
-       }
-    }//GEN-LAST:event_chk2BasculasActionPerformed
-
-    private void cmdStartWebServer2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdStartWebServer2ActionPerformed
-        if ( cmdStartWebServer2.isSelected() ){
-            try{
-                iniciarServicio();
-                cmdStartWebServer2.setText("Detener Servicio");
-            }catch(Exception e){
-                
-            }
-        } else{
-            try{
-            detenerServicio();
-            cmdStartWebServer2.setText("Iniciar Servicio");
-            }catch(Exception e){
-                
-                
-            }
         }
-    }//GEN-LAST:event_cmdStartWebServer2ActionPerformed
+    }// GEN-LAST:event_chk2BasculasActionPerformed
+
+    private void txtIPActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_txtIPActionPerformed
+        // TODO add your handling code here:
+    }// GEN-LAST:event_txtIPActionPerformed
+
+    private void txtTextaImprimirNETActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_txtTextaImprimirNETActionPerformed
+        try {
+
+            TCPClient.test(txtIP.getText(), txtPort.getText(), txtTextaImprimirNET.getText(), "");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error Al tratar de impimir NET",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }// GEN-LAST:event_txtTextaImprimirNETActionPerformed
+
+    private void cmdImprimirNetworkActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_cmdImprimirNetworkActionPerformed
+        // TODO add your handling code here:
+    }// GEN-LAST:event_cmdImprimirNetworkActionPerformed
 
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+        // <editor-fold defaultstate="collapsed" desc=" Look and feel setting code
+        // (optional) ">
+        /*
+		 * If Nimbus (introduced in Java SE 6) is not available, stay with the default
+		 * look and feel. For details see
+		 * http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
@@ -528,7 +928,7 @@ public class Lector extends javax.swing.JFrame {
                 }
             }
 
-            //gets port
+            // gets port
         } catch (ClassNotFoundException ex) {
             java.util.logging.Logger.getLogger(Lector.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
@@ -538,14 +938,14 @@ public class Lector extends javax.swing.JFrame {
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(Lector.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
+        // </editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
                     new Lector().setVisible(true);
-                }catch(Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                     System.exit(0);
                 }
@@ -555,41 +955,67 @@ public class Lector extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton CMDCerrar;
-    private javax.swing.JComboBox<SerialPort> cboBasculaPort;
-    private javax.swing.JComboBox<SerialPort> cboMHumedadPort;
+    private javax.swing.JButton CmdEnviarTexto;
+    private javax.swing.JLayeredPane Impresora;
+    private javax.swing.JComboBox cboBasculaPort;
+    private javax.swing.JComboBox cboImpresoras;
+    private javax.swing.JComboBox cboMHumedadPort;
     private javax.swing.JCheckBox chk2Basculas;
     private javax.swing.JCheckBox chkJustOne;
+    private javax.swing.JButton cmdImprimirNetwork;
     private javax.swing.JButton cmdLeerBascula;
     private javax.swing.JButton cmdLeerHumedad;
+    private javax.swing.JButton cmdPrueba2;
+    private javax.swing.JButton cmdRefreshPorts;
     private javax.swing.JButton cmdReloadPorts;
     private javax.swing.JButton cmdStartWebServer;
     private javax.swing.JToggleButton cmdStartWebServer2;
+    private javax.swing.JButton cmdTestCom;
+    private javax.swing.JButton cmdTestComCPL;
+    private javax.swing.JButton cmdTestLPT;
+    private javax.swing.JButton cmdTestLPTEPL;
+    private javax.swing.JButton cmdprueba3;
+    private javax.swing.JDialog jDialog1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLayeredPane jLayeredPane1;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea lblLectura;
     private javax.swing.JLabel lblPuerto2;
     private javax.swing.JLabel lblStatus;
     private javax.swing.JMenuItem mnuModoPrueba;
+    private javax.swing.JTabbedPane panelSensores;
+    private javax.swing.JTextField txtIP;
+    private javax.swing.JTextField txtPort;
+    private javax.swing.JTextField txtTextaImprimirNET;
+    private javax.swing.JTextField txtTextoImprimir;
     // End of variables declaration//GEN-END:variables
 
-    //carga todos los puertos existentes en los CBO
+    // carga todos los puertos existentes en los CBO
     private void getPortsToModel() {
-        ports = SerialPort.getCommPorts();
-        SerialPort[] ports = SerialPort.getCommPorts();
+        ports = PuertoSerialMod.puertos(SerialPort.getCommPorts());
+
         cboBasculaPort.removeAllItems();
         cboMHumedadPort.removeAllItems();
+        cboImpresoras.removeAll();
         lblStatus.setText("**");
-        if (ports.length > 0) {
-            for (SerialPort port : ports) {
+        if (ports.size() > 0) {
+            for (PuertoSerialMod port : ports) {
                 cboBasculaPort.addItem(port);
                 cboMHumedadPort.addItem(port);
+                cboImpresoras.addItem(port);
             }
         } else {
             System.out.println("No hay puertos.");
@@ -597,26 +1023,26 @@ public class Lector extends javax.swing.JFrame {
         }
     }
 
-    public static JTextArea getLector(){
+    public static JTextArea getLector() {
         return MyInstance.lblLectura;
     }
-    public static JLabel getStatus(){
+
+    public static JLabel getStatus() {
         return MyInstance.lblStatus;
     }
-    
-    public Image getMyIconApp(){
-        
+
+    public Image getMyIconApp() {
+
         String ruta = this.getClass().getResource("").toString();
-        System.out.println("ruta:" + ruta );
+        System.out.println("ruta:" + ruta);
         ImageIcon image = null;
         try {
-            image = new ImageIcon( getClass().getResource( "/icons/iconobascula.png" ) );
-        } catch (Exception  ex) {
+            image = new ImageIcon(getClass().getResource("/icons/iconobascula.png"));
+        } catch (Exception ex) {
             Logger.getLogger(Lector.class.getName()).log(Level.SEVERE, null, ex);
         }
         return image.getImage();
     }
-
 
     // get a file from the resources folder
     // works everywhere, IDEA, unit test and JAR file.
@@ -626,7 +1052,7 @@ public class Lector extends javax.swing.JFrame {
         ClassLoader classLoader = getClass().getClassLoader();
         InputStream inputStream = classLoader.getResourceAsStream(fileName);
         InputStream inputStream2 = classLoader.getResourceAsStream("");
-        System.out.println(inputStream2.toString()  );
+        System.out.println(inputStream2.toString());
 
         // the stream holding the file content
         if (inputStream == null) {
@@ -638,11 +1064,11 @@ public class Lector extends javax.swing.JFrame {
     }
 
     /*
-        The resource URL is not working in the JAR
-        If we try to access a file that is inside a JAR,
-        It throws NoSuchFileException (linux), InvalidPathException (Windows)
-
-        Resource URL Sample: file:java-io.jar!/json/file1.json
+	 * The resource URL is not working in the JAR If we try to access a file that is
+	 * inside a JAR, It throws NoSuchFileException (linux), InvalidPathException
+	 * (Windows)
+	 * 
+	 * Resource URL Sample: file:java-io.jar!/json/file1.json
      */
     private File getFileFromResource(String fileName) throws URISyntaxException {
 
@@ -653,7 +1079,7 @@ public class Lector extends javax.swing.JFrame {
 
         } else {
             // failed if files have whitespaces or special characters
-            //return new File(resource.getFile());
+            // return new File(resource.getFile());
             return new File(resource.toURI());
         }
 
@@ -661,94 +1087,93 @@ public class Lector extends javax.swing.JFrame {
 
     /**
      * Si no está leyendo el servicio el puerto 1, lo inicia.
+     *
      * @throws InterruptedException
      */
     private void iniciarLeerPuertoB01() throws InterruptedException {
-        if ( !Lector.leyendoPuerto1 ) {
-            System.out.println("Puertos: " + ports.length);
-            SerialPort comPort = (SerialPort) cboBasculaPort.getSelectedItem();
+        if (!Lector.leyendoPuerto1) {
+            System.out.println("Puertos: " + ports.size());
+            SerialPort comPort = PuertoSerialMod.getPort(cboBasculaPort);
             ReadPortsBascula bascula = new ReadPortsBascula("MyBsccula", comPort);
         }
     }
-    
+
     private void iniciarLeerPuertoB02() throws InterruptedException {
-        if ( !Lector.leyendoPuerto2 ) {
-            System.out.println("Puertos(B2): " + ports.length);
-            SerialPort comPort = (SerialPort) cboMHumedadPort.getSelectedItem();
+        if (!Lector.leyendoPuerto2) {
+            System.out.println("Puertos(B2): " + ports.size());
+            SerialPort comPort = PuertoSerialMod.getPort(cboMHumedadPort);
             ReadPortsBascula bascula = new ReadPortsBascula("MyBsccula2", comPort);
         }
     }
 
-    private void iniciarServicio(){
-              try {
-            //validando si ambos puertos son los mismos.
-            if ( ((SerialPort) cboBasculaPort.getSelectedItem()).getDescriptivePortName().equals(  ((SerialPort) cboMHumedadPort.getSelectedItem()).getDescriptivePortName()  ) ){
-                if ( !this.chkJustOne.isSelected() ){
-                    throw new Exception("Los puertos a utilizar no pueden ser el mismo. ");
+    private void iniciarServicio() throws Exception {
+        // validando si ambos puertos son los mismos.
+        if (PuertoSerialMod.comparePorts(cboBasculaPort, cboMHumedadPort)) {
+            if (!this.chkJustOne.isSelected()) {
+                throw new Exception("Los puertos a utilizar no pueden ser el mismo. ");
+            }
+        }
+
+        // verificar puerto 01
+        if (!Lector.leyendoPuerto1) {
+            iniciarLeerPuertoB01();
+        }
+
+        // verificar si se puede leer puerto 01
+        // verificar si esta baierto puerto 02
+        if (!chkJustOne.isSelected()) {
+            if (!Lector.leyendoPuerto2) {
+                if (chk2Basculas.isSelected()) {
+                    iniciarLeerPuertoB02();
+                } else {
+                    iniciarLeerPuertoMHumedad();
                 }
             }
-            
-            // verificar puerto 01
-            if ( !Lector.leyendoPuerto1 )
-                iniciarLeerPuertoB01();
+        }
 
-            // verificar si se puede leer puerto 01
-            // verificar si esta baierto puerto 02
-            if ( !chkJustOne.isSelected() ){
-                if ( !Lector.leyendoPuerto2 ){
-                    if ( chk2Basculas.isSelected() )
-                        iniciarLeerPuertoB02();
-                    else
-                        iniciarLeerPuertoMHumedad();
-                }
-            }
+        // iniciar webserver
+        if (this.server == null) {
+            SimpleHTTPServer.StartWebServer();
+        }
 
-            //iniciar webserver
-            if ( this.server == null )
-                SimpleHTTPServer.StartWebServer( );
-
-            //ocultar
-            try{
-                tray.add(trayIcon);
-            }catch(Exception e){}
-            
-            setVisible(false);
-                        
+        // ocultar
+        try {
+            tray.add(trayIcon);
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, e.getMessage(),"Error Al iniciar Servicio",JOptionPane.ERROR_MESSAGE);
+        }
+        setVisible(false);
+    }
+
+    private void iniciarServicioModoDesarroll() throws IOException {
+        // iniciar webserver
+        modoDeveloper = true;
+        if (this.server == null) {
+            SimpleHTTPServer.StartWebServer();
         }
     }
-    
-    private void iniciarServicioModoDesarroll() throws IOException{
-            //iniciar webserver
-            modoDeveloper = true;
-            if ( this.server == null )
-                SimpleHTTPServer.StartWebServer( );
-    }
-    
+
     private void iniciarLeerPuertoMHumedad() throws InterruptedException {
-        if ( !Lector.leyendoPuerto2 ) {
-            System.out.println("PuertosMH(2): " + ports.length);
-            SerialPort comPortBascula = (SerialPort) cboBasculaPort.getSelectedItem();
-            SerialPort comPortMHumedad = (SerialPort) cboMHumedadPort.getSelectedItem();
+        if (!Lector.leyendoPuerto2) {
+            System.out.println("PuertosMH(2): " + ports.size());
+            SerialPort comPortBascula = PuertoSerialMod.getPort(cboBasculaPort);
+            SerialPort comPortMHumedad = PuertoSerialMod.getPort(cboMHumedadPort);
             ReadPortsBascula hilobascula;
             ReadPortsHumedad hiloHumedad;
-            if ( chk2Basculas.isSelected() ){
+            if (chk2Basculas.isSelected()) {
                 System.out.println("Iniciando lectura de segunda bascula");
                 hilobascula = new ReadPortsBascula("MyBasCula2", comPortBascula);
-            }else{
+            } else {
                 System.out.println("Iniciando lectura de Sensor de humedad.");
                 hiloHumedad = new ReadPortsHumedad("MySensoHumedad", comPortMHumedad);
             }
         }
     }
 
-
     private Image getIconResource() {
-        URL resource = Lector.class.getClass().getResource( "/icons/iconobascula.png");
+        URL resource = Lector.class.getClass().getResource("/icons/iconobascula.png");
         BufferedImage image = null;
         try {
-            image = ImageIO.read( resource );
+            image = ImageIO.read(resource);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -756,7 +1181,24 @@ public class Lector extends javax.swing.JFrame {
     }
 
     private void detenerServicio() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Esto aun no está programado."); // To change body of generated methods, choose
+        // Tools | Templates.
+    }
+
+    private void mtdInicarServicioWebFromSWitchedBootn(JButton cmdStartWebServer) {
+        try {
+            if (cmdStartWebServer2.isSelected()) {
+                iniciarServicio();
+                cmdStartWebServer2.setText("Detener Servicio");
+            } else {
+                detenerServicio();
+                cmdStartWebServer2.setText("Iniciar Servicio");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            cmdStartWebServer2.setSelected(false);
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error Al iniciar Servicio.BTN", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
 }
