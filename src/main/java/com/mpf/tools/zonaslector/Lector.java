@@ -15,10 +15,9 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
@@ -28,8 +27,15 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.print.Doc;
 import javax.print.DocFlavor;
+import javax.print.DocPrintJob;
 import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
+import javax.print.SimpleDoc;
+import javax.print.attribute.AttributeSet;
+import javax.print.attribute.HashAttributeSet;
+import javax.print.attribute.HashPrintRequestAttributeSet;
+import javax.print.attribute.standard.ColorSupported;
+import javax.print.attribute.standard.PrinterName;
 import javax.swing.*;
 
 /**
@@ -214,6 +220,7 @@ public class Lector extends javax.swing.JFrame {
         cmdTestLPT = new javax.swing.JButton();
         cmdTestLPTEPL = new javax.swing.JButton();
         jLabel8 = new javax.swing.JLabel();
+        cmdElegir = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         mnuModoPrueba = new javax.swing.JMenuItem();
@@ -470,6 +477,13 @@ public class Lector extends javax.swing.JFrame {
 
         jLabel8.setText("Nombre Impresora");
 
+        cmdElegir.setText("Eligiendo impresora");
+        cmdElegir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmdElegirActionPerformed(evt);
+            }
+        });
+
         Impresora.setLayer(cboImpresoras, javax.swing.JLayeredPane.DEFAULT_LAYER);
         Impresora.setLayer(jLabel3, javax.swing.JLayeredPane.DEFAULT_LAYER);
         Impresora.setLayer(cmdRefreshPorts, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -481,36 +495,42 @@ public class Lector extends javax.swing.JFrame {
         Impresora.setLayer(cmdTestLPT, javax.swing.JLayeredPane.DEFAULT_LAYER);
         Impresora.setLayer(cmdTestLPTEPL, javax.swing.JLayeredPane.DEFAULT_LAYER);
         Impresora.setLayer(jLabel8, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        Impresora.setLayer(cmdElegir, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
         javax.swing.GroupLayout ImpresoraLayout = new javax.swing.GroupLayout(Impresora);
         Impresora.setLayout(ImpresoraLayout);
         ImpresoraLayout.setHorizontalGroup(
             ImpresoraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(ImpresoraLayout.createSequentialGroup()
-                .addGap(21, 21, 21)
                 .addGroup(ImpresoraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(ImpresoraLayout.createSequentialGroup()
-                        .addComponent(cmdTestLPT, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(cmdprueba3, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(ImpresoraLayout.createSequentialGroup()
-                        .addComponent(jLabel3)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(cboImpresoras, javax.swing.GroupLayout.PREFERRED_SIZE, 187, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(cmdRefreshPorts, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(ImpresoraLayout.createSequentialGroup()
+                        .addGap(21, 21, 21)
                         .addGroup(ImpresoraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtImpresoraNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 248, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(ImpresoraLayout.createSequentialGroup()
-                                .addComponent(cmdTestComCPL, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addGroup(ImpresoraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(cmdTestLPTEPL, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(cmdTestCom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                            .addComponent(jLabel8))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 22, Short.MAX_VALUE)
-                        .addComponent(cmdPrueba2, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addComponent(cmdTestLPT, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(cmdprueba3, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(ImpresoraLayout.createSequentialGroup()
+                                .addComponent(jLabel3)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(cboImpresoras, javax.swing.GroupLayout.PREFERRED_SIZE, 187, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(cmdRefreshPorts, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(ImpresoraLayout.createSequentialGroup()
+                                .addGroup(ImpresoraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtImpresoraNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 248, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(ImpresoraLayout.createSequentialGroup()
+                                        .addComponent(cmdTestComCPL, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(18, 18, 18)
+                                        .addGroup(ImpresoraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                            .addComponent(cmdTestLPTEPL, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                            .addComponent(cmdTestCom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                    .addComponent(jLabel8))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 22, Short.MAX_VALUE)
+                                .addComponent(cmdPrueba2, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, ImpresoraLayout.createSequentialGroup()
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(cmdElegir, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         ImpresoraLayout.setVerticalGroup(
@@ -524,8 +544,8 @@ public class Lector extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel8)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtImpresoraNombre)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtImpresoraNombre, javax.swing.GroupLayout.DEFAULT_SIZE, 34, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
                 .addGroup(ImpresoraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cmdPrueba2)
                     .addComponent(cmdTestComCPL)
@@ -535,7 +555,9 @@ public class Lector extends javax.swing.JFrame {
                     .addComponent(cmdprueba3)
                     .addComponent(cmdTestLPT)
                     .addComponent(cmdTestLPTEPL))
-                .addGap(78, 78, 78))
+                .addGap(18, 18, 18)
+                .addComponent(cmdElegir)
+                .addGap(38, 38, 38))
         );
 
         panelSensores.addTab("Impresora", Impresora);
@@ -614,14 +636,14 @@ public class Lector extends javax.swing.JFrame {
             //PrintStream ps = new PrintStream(os);
             // EPL goes here
             PrintService pservice = PrintServiceLookup.lookupDefaultPrintService();
-            if (pservice == null)
+            if (pservice == null) {
                 throw new Exception("No existen impresoras instaladas");
+            }
             javax.print.DocPrintJob job = pservice.createPrintJob();
             String commands = ("^XA ^FO50,50^BY3^BCN,100,Y,N,N^FD>;382436>6CODE128>752375152^FS ^XZ");
             javax.print.DocFlavor flavor = javax.print.DocFlavor.BYTE_ARRAY.AUTOSENSE;
             javax.print.Doc doc = new javax.print.SimpleDoc(commands.getBytes(), flavor, null);
             job.print(doc, null);
-            
 
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, e.getMessage(), "Error a intentar imprimir puerto usando Puerto Name System.: ",
@@ -633,16 +655,17 @@ public class Lector extends javax.swing.JFrame {
     private void cmdTestComCPLActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdTestComCPLActionPerformed
         try {
             //ComCPL.test( txtImpresoraNombre.getText().trim() );
-            
+
             PrintService pservice = PrintServiceLookup.lookupDefaultPrintService();
-            if (pservice == null)
+            if (pservice == null) {
                 throw new Exception("No existen impresoras instaladas");
+            }
             javax.print.DocPrintJob job = pservice.createPrintJob();
             String commands = "! 0 200 200 25 1 \n BARRA-SENSE \n TEXTO 5 1 0 5 Tech. Support \n FORMA  \n IMPRESORA";
             javax.print.DocFlavor flavor = javax.print.DocFlavor.BYTE_ARRAY.AUTOSENSE;
             javax.print.Doc doc = new javax.print.SimpleDoc(commands.getBytes(), flavor, null);
             job.print(doc, null);
-            
+
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, e.getMessage(), "Error a intentar imprimir puerto usando Puerto Name System.: ",
                     JOptionPane.ERROR_MESSAGE);
@@ -653,15 +676,15 @@ public class Lector extends javax.swing.JFrame {
         try {
             //ComTest.test( txtImpresoraNombre.getText().trim() );
             PrintService pservice = PrintServiceLookup.lookupDefaultPrintService();
-            if (pservice == null)
+            if (pservice == null) {
                 throw new Exception("No existen impresoras instaladas");
+            }
             javax.print.DocPrintJob job = pservice.createPrintJob();
             String commands = "^XA^FO50,50^A050,50^FDSoporte Tenicco GROUPHPSAP^FS^XZ";
             javax.print.DocFlavor flavor = javax.print.DocFlavor.BYTE_ARRAY.AUTOSENSE;
             javax.print.Doc doc = new javax.print.SimpleDoc(commands.getBytes(), flavor, null);
             job.print(doc, null);
-            
-            
+
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, e.getMessage(), "Error a intentar imprimir puerto usando Puerto Name System.: ", JOptionPane.ERROR_MESSAGE);
         }
@@ -669,16 +692,16 @@ public class Lector extends javax.swing.JFrame {
 
     private void cmdTestLPTActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdTestLPTActionPerformed
         try {
-            Lpt.test( txtImpresoraNombre.getText().trim() );
+            Lpt.test(txtImpresoraNombre.getText().trim());
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, e.getMessage(), "Error a intentar imprimir puerto usando Puerto Name System.: ", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_cmdTestLPTActionPerformed
 
     private void cmdTestLPTEPLActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdTestLPTEPLActionPerformed
-        try{   
-            ComCPL.test(txtImpresoraNombre.getText().trim() );
-        }catch(Exception e){
+        try {
+            ComCPL.test(txtImpresoraNombre.getText().trim());
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(this, e.getMessage(), "Error a intentar imprimir puerto usando Puerto Name System.: ", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_cmdTestLPTEPLActionPerformed
@@ -687,30 +710,77 @@ public class Lector extends javax.swing.JFrame {
         getPortsToModel();
     }//GEN-LAST:event_cmdRefreshPortsActionPerformed
 
-    private void cmdprueba3ActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_cmdprueba3ActionPerformed
+    private void cmdprueba3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdprueba3ActionPerformed
         try {
-            
+
             JOptionPane.showMessageDialog(this, "Intentando imprimir en la impresora por defecto");
             //DocFlavor docFormat = DocFlavor.INPUT_STREAM.AUTOSENSE;
             //Doc document = new SimpleDoc(inputStream, docFormat, null);
- 
+
             //PrintRequestAttributeSet attributeSet = new HashPrintRequestAttributeSet();
- 
             PrintService pservice = PrintServiceLookup.lookupDefaultPrintService();
-            if (pservice == null)
+            if (pservice == null) {
                 throw new Exception("No existen impresoras instaladas");
+            }
 
             javax.print.DocPrintJob job = pservice.createPrintJob();
-            String commands = "^XA\n\r^MNM\n\r^FO050,50\n\r^B8N,100,Y,N\n\r^FD1234567\n\r^FS\n\r^PQ3\n\r^XZ";
+            //String commands = "^XA\n\r^MNM\n\r^FO050,50\n\r^B8N,100,Y,N\n\r^FD1234567\n\r^FS\n\r^PQ3\n\r^XZ";
+            //String commands = "^XA\n\r^MNM\n\r^FO050,50\n\r^B8N,100,Y,N\n\r^FD1234567\n\r^FS\n\r^PQ3\n\r^XZ";
+            String commands = ""
+                    + "^XA"
+                    + "^FO250, 70^ADN, 11, 7^FD MACHU PICCHU FOOD^FS" //FIN DEL CAMPO
+                    + "^FO320, 105^ADN, 11, 7^FD Prueba 1 ^FS"
+                    + "^FO30, 150^ADN, 11, 7^FD Texto de muestra 1 ^FS "
+                    + "^FO350, 200^ADN, 11, 7 "
+                    + "^BCN, 80, Y, Y, N^FD corptectr>147896325 ^FS"
+                    + "^XZ "; 
             javax.print.DocFlavor flavor = javax.print.DocFlavor.BYTE_ARRAY.AUTOSENSE;
             javax.print.Doc doc = new javax.print.SimpleDoc(commands.getBytes(), flavor, null);
             job.print(doc, null);
-            
+
         } catch (java.lang.Exception e) {
             JOptionPane.showMessageDialog(this, e.getMessage(), "Error a intentar imprimir usando prinr service: ",
                     JOptionPane.ERROR_MESSAGE);
         }
-    }// GEN-LAST:event_cmdprueba3ActionPerformed
+    }//GEN-LAST:event_cmdprueba3ActionPerformed
+
+    private void cmdElegirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdElegirActionPerformed
+        try {
+
+            //Archivo que se desea imprimir
+            FileInputStream inputStream = new FileInputStream("c:/archivo.pdf");
+
+            //Formato de Documento
+            DocFlavor docFormat = DocFlavor.INPUT_STREAM.AUTOSENSE;
+            //Lectura de Documento
+            Doc document = new SimpleDoc(inputStream, docFormat, null);
+
+            //Nombre de la impresora
+            String printerName = "HP3015";
+
+            //Inclusion del nombre de impresora y sus atributos
+            AttributeSet attributeSet = new HashAttributeSet();
+            attributeSet.add(new PrinterName(printerName, null));
+            attributeSet = new HashAttributeSet();
+            //Soporte de color o no
+            attributeSet.add(ColorSupported.NOT_SUPPORTED);
+
+            //Busqueda de la impresora por el nombre asignado en attributeSet
+            PrintService[] services = PrintServiceLookup.lookupPrintServices(docFormat, attributeSet);
+
+            System.out.println("Imprimiendo en : " + services[0].getName());
+
+            DocPrintJob printJob = services[0].createPrintJob();
+            //Envio a la impresora
+            printJob.print(document, new HashPrintRequestAttributeSet());
+
+            inputStream.close();
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error a intentar leer el puerto02 M. de Humedad.",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_cmdElegirActionPerformed
 
     private void cmdLeerBasculaActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_cmdLeerBasculaActionPerformed
 
@@ -823,8 +893,6 @@ public class Lector extends javax.swing.JFrame {
     private void txtTextaImprimirNETActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_txtTextaImprimirNETActionPerformed
         try {
 
-            TCPClient.test(txtIP.getText(), txtPort.getText(), txtTextaImprimirNET.getText(), "");
-
         } catch (Exception e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this, e.getMessage(), "Error Al tratar de impimir NET",
@@ -889,6 +957,7 @@ public class Lector extends javax.swing.JFrame {
     private javax.swing.JComboBox cboMHumedadPort;
     private javax.swing.JCheckBox chk2Basculas;
     private javax.swing.JCheckBox chkJustOne;
+    private javax.swing.JButton cmdElegir;
     private javax.swing.JButton cmdLeerBascula;
     private javax.swing.JButton cmdLeerHumedad;
     private javax.swing.JButton cmdPrueba2;
