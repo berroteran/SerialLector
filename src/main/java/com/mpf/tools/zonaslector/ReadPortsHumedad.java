@@ -21,7 +21,7 @@ public class ReadPortsHumedad implements Runnable {
         name = myBsccula;
         this.detener = false;
         t = new Thread(this, name);
-        t.start();
+        //t.start();
     }
 
     // metodo para poner el boolean a false.

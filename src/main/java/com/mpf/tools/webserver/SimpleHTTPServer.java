@@ -1,13 +1,11 @@
-package com.mpf.tools.zonaslector;
+package com.mpf.tools.webserver;
 
+import com.mpf.tools.zonaslector.Lector;
 import com.sun.net.httpserver.HttpServer;
 
 import java.io.EOFException;
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 

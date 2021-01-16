@@ -6,6 +6,7 @@
 package com.mpf.tools.zonaslector;
 
 import com.fazecast.jSerialComm.SerialPort;
+import com.mpf.tools.webserver.SimpleHTTPServer;
 import com.mpf.tools.zonasimpresora.*;
 import com.sun.net.httpserver.HttpServer;
 import java.awt.*;
@@ -56,6 +57,13 @@ public class Lector extends javax.swing.JFrame {
     public static boolean leyendoPuerto1 = false;
     public static boolean leyendoPuerto2 = false;
     public static HttpServer server = null;
+    public static String printerName = "No Impresora";
+    public static String printerException = "No Impresora";
+    public static boolean serviceRUN = false;
+    public static Thread hilo1;
+    public ReadPortsBascula hiloBascula;
+    ReadPortsBascula hiloBascula2;
+    ReadPortsHumedad hiloHumedad;
 
     /**
      * Creates new form Lector
@@ -141,6 +149,8 @@ public class Lector extends javax.swing.JFrame {
 
         // cerrar oon exit.
         // setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        //detectar Impresora
+        detectarImpresora();
     }
 
     public static String getBascula() {
@@ -176,6 +186,14 @@ public class Lector extends javax.swing.JFrame {
 
     public static void setHumedad(String v) {
         humedad = v;
+    }
+
+    public static String getPrinterName() {
+        return printerName;
+    }
+
+    public static void prinTicket() {
+        JOptionPane.showMessageDialog(Lector.MyInstance, "Imprimiendo en la impresora por defecto: " + printerName);
     }
 
     /**
@@ -733,7 +751,7 @@ public class Lector extends javax.swing.JFrame {
                     + "^FO30, 150^ADN, 11, 7^FD Texto de muestra 1 ^FS "
                     + "^FO350, 200^ADN, 11, 7 "
                     + "^BCN, 80, Y, Y, N^FD corptectr>147896325 ^FS"
-                    + "^XZ "; 
+                    + "^XZ ";
             javax.print.DocFlavor flavor = javax.print.DocFlavor.BYTE_ARRAY.AUTOSENSE;
             javax.print.Doc doc = new javax.print.SimpleDoc(commands.getBytes(), flavor, null);
             job.print(doc, null);
@@ -1082,7 +1100,9 @@ public class Lector extends javax.swing.JFrame {
         if (!Lector.leyendoPuerto1) {
             System.out.println("Puertos: " + ports.size());
             SerialPort comPort = PuertoSerialMod.getPort(cboBasculaPort);
-            ReadPortsBascula bascula = new ReadPortsBascula("MyBsccula", comPort);
+            //
+            hiloBascula = new ReadPortsBascula("MyBsccula", comPort);
+            //hiloBascula.run();
         }
     }
 
@@ -1090,7 +1110,8 @@ public class Lector extends javax.swing.JFrame {
         if (!Lector.leyendoPuerto2) {
             System.out.println("Puertos(B2): " + ports.size());
             SerialPort comPort = PuertoSerialMod.getPort(cboMHumedadPort);
-            ReadPortsBascula bascula = new ReadPortsBascula("MyBsccula2", comPort);
+            hiloBascula2 = new ReadPortsBascula("MyBsccula2", comPort);
+            //hiloBascula2.run();
         }
     }
 
@@ -1145,14 +1166,15 @@ public class Lector extends javax.swing.JFrame {
             System.out.println("PuertosMH(2): " + ports.size());
             SerialPort comPortBascula = PuertoSerialMod.getPort(cboBasculaPort);
             SerialPort comPortMHumedad = PuertoSerialMod.getPort(cboMHumedadPort);
-            ReadPortsBascula hilobascula;
-            ReadPortsHumedad hiloHumedad;
+
             if (chk2Basculas.isSelected()) {
                 System.out.println("Iniciando lectura de segunda bascula");
-                hilobascula = new ReadPortsBascula("MyBasCula2", comPortBascula);
+                hiloBascula2 = new ReadPortsBascula("MyBasCula2", comPortBascula);
+                //hiloBascula2.run();
             } else {
                 System.out.println("Iniciando lectura de Sensor de humedad.");
                 hiloHumedad = new ReadPortsHumedad("MySensoHumedad", comPortMHumedad);
+                //hiloHumedad.run();
             }
         }
     }
@@ -1169,8 +1191,11 @@ public class Lector extends javax.swing.JFrame {
     }
 
     private void detenerServicio() {
-        throw new UnsupportedOperationException("Esto aun no está programado."); // To change body of generated methods, choose
-        // Tools | Templates.
+        if ( hiloBascula != null)
+            hiloBascula.stop();
+        if ( hiloBascula2 != null )
+            hiloBascula2.stop();
+        SimpleHTTPServer.stopServiceHTT();
     }
 
     private void mtdInicarServicioWebFromSWitchedBootn(JButton cmdStartWebServer) {
@@ -1186,6 +1211,21 @@ public class Lector extends javax.swing.JFrame {
             e.printStackTrace();
             cmdStartWebServer2.setSelected(false);
             JOptionPane.showMessageDialog(this, e.getMessage(), "Error Al iniciar Servicio.BTN", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public static void detectarImpresora() {
+        try {
+            PrintService service  = PrintServiceLookup.lookupDefaultPrintService();
+            if (service != null) {
+                String printServiceName = service.getName();
+                printerName = printServiceName;
+            } else {
+                printerName = "No Default Printer";
+            }
+        } catch (Exception e) {
+            printerName = "Problema Detectando Print.";
+            printerException = e.getMessage();
         }
     }
 

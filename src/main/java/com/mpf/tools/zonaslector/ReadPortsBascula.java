@@ -29,6 +29,7 @@ public class ReadPortsBascula implements Runnable {
 
     // metodo para poner el boolean a false.
     public void stop() {
+        Lector.leyendoPuerto1 = false;
         this.detener = true;
     }
 

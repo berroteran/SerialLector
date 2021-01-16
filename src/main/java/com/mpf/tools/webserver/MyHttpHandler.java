@@ -1,5 +1,6 @@
-package com.mpf.tools.zonaslector;
+package com.mpf.tools.webserver;
 
+import com.mpf.tools.zonaslector.Lector;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
@@ -24,11 +25,13 @@ public class MyHttpHandler implements HttpHandler {
         String requestParamValue = null;
 
         if ("GET".equals(httpExchange.getRequestMethod())) {
+            //limpiando los parametros GET
             requestParamValue = handleGetRequest(httpExchange);
         } else if ("POST".equals(httpExchange)) {
             requestParamValue = handlePostRequest(httpExchange);
         }
-        //
+
+        //respuesta
         httpExchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
         if (httpExchange.getRequestMethod().equalsIgnoreCase("OPTIONS")) {
             httpExchange.getResponseHeaders().add("Access-Control-Allow-Methods", "GET, OPTIONS");
@@ -37,9 +40,15 @@ public class MyHttpHandler implements HttpHandler {
             return;
         }
         httpExchange.getResponseHeaders().add(HEADER_CONTENT_TYPE, String.format("application/json; charset=%s", CHARSET));
-        handleResponse(httpExchange, requestParamValue);
+        generandoResponse(httpExchange, requestParamValue);
     }
 
+
+    /**
+     * Manejando POST request,
+     * @param httpExchange
+     * @return
+     */
     private String handlePostRequest(HttpExchange httpExchange) {
 
         return httpExchange.
@@ -49,32 +58,55 @@ public class MyHttpHandler implements HttpHandler {
                 .split("=")[1];
     }
 
+
+    /**
+     * Manejar GET Request
+     * @param httpExchange
+     * @return
+     */
     private String handleGetRequest(HttpExchange httpExchange) {
-        String par = httpExchange.
+        String pars = httpExchange.
                 getRequestURI()
                 .toString()
-                .split("\\?")[1]
-                .split("=")[1];
+                .split("\\?")[1];
+        String par  = pars.split("&")[0];
         String valor = "";
+        System.out.println("valor parametros: " + pars);
         System.out.println("valor parametro: " + par);
-        if (par.equals("b")) {
-            valor = Lector.getBascula();
-        } else {
-            valor = Lector.getHumedad();
+        if (par.equals("puerto=print")) {
+            Lector.prinTicket();
         }
         return valor;
     }
 
-    private void handleResponse(HttpExchange httpExchange, String requestParamValue) throws IOException {
+
+    /**
+     *
+     * @param httpExchange
+     * @param requestParamValue
+     * @throws IOException
+     */
+    private void generandoResponse(HttpExchange httpExchange, String requestParamValue) throws IOException {
+        //recuperando parametros
         requestParamValue = requestParamValue == null ? "" : requestParamValue;
+        //parametros
+        if ( !requestParamValue.equals("")){
+
+        }
         OutputStream outputStream = httpExchange.getResponseBody();
         StringBuilder htmlBuilder = new StringBuilder();
-
-        String cadena = "{\"status\":\"OK\", \"data\" : [ ";
+        //intentando obtener Impresoras;
+        Lector.detectarImpresora();
+        //armar cadena
+        String cadena = "{\"status\":\"OK\", " +
+                "\"data\" : [ ";
         cadena += "{\"port1\":\"" + Lector.getBascula() + "\"} ";
         cadena += ",";
         cadena += "{\"port2\":\"" + Lector.getHumedad() + "\"} ";
-        cadena += "]}";
+        cadena += ",";
+        cadena += "{\"port3\":\"" + Lector.getPrinterName() + "\", \"exception\":\"" + Lector.printerException + "\"} ";
+        cadena += "]" +
+                "}";
 
         htmlBuilder.append(cadena);
         // encode HTML content
