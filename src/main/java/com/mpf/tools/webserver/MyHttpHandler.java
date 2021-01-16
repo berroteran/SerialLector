@@ -1,5 +1,6 @@
 package com.mpf.tools.webserver;
 
+import com.mpf.tools.zonasimpresora.Atencion;
 import com.mpf.tools.zonaslector.Lector;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -74,7 +75,9 @@ public class MyHttpHandler implements HttpHandler {
         System.out.println("valor parametros: " + pars);
         System.out.println("valor parametro: " + par);
         if (par.equals("puerto=print")) {
-            Lector.prinTicket();
+            //conviertiendo
+            Atencion atencion = new Atencion(pars);
+            Lector.prinTicket(atencion);
         }
         return valor;
     }
