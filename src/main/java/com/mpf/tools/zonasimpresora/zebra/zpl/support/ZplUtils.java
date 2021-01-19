@@ -8,10 +8,11 @@
  * Jan 26, 2016		Venkaiah Chowdary Koneru		Created
  * *************************************************************
  */
+
 package com.mpf.tools.zonasimpresora.zebra.zpl.support;
 
-import com.finium.core.drivers.zebra.zpl.enums.ZebraFont;
-import com.finium.core.drivers.zebra.zpl.enums.ZebraPPP;
+import com.mpf.tools.zonasimpresora.zebra.zpl.enums.ZebraFont;
+import com.mpf.tools.zonasimpresora.zebra.zpl.enums.ZebraPPP;
 
 /**
  * Common method used to manipulate ZPL
@@ -49,8 +50,6 @@ public class ZplUtils {
      * 
      * @param command
      *            Command (without ^)
-     * @param variables
-     *            list variable
      * @return
      */
     public static StringBuilder zplCommand(String command) {
@@ -65,7 +64,7 @@ public class ZplUtils {
      * 
      * @param command
      *            Command (without ^)
-     * @param variables
+     *
      *            list variable
      * @return
      */

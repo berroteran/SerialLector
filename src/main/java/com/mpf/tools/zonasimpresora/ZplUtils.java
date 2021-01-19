@@ -11,8 +11,9 @@ package com.mpf.tools.zonasimpresora;
  * *************************************************************
  */
 
-import com.mpf.tools.zonasimpresora.enums.ZebraFont;
-import com.mpf.tools.zonasimpresora.enums.ZebraPPP;
+
+import com.mpf.tools.zonasimpresora.zebra.zpl.enums.ZebraFont;
+import com.mpf.tools.zonasimpresora.zebra.zpl.enums.ZebraPPP;
 
 /**
  * Common method used to manipulate ZPL
@@ -50,7 +51,6 @@ public class ZplUtils {
      *
      * @param command
      *            Command (without ^)
-     * @param variables
      *            list variable
      * @return
      */
@@ -66,7 +66,6 @@ public class ZplUtils {
      *
      * @param command
      *            Command (without ^)
-     * @param variables
      *            list variable
      * @return
      */
