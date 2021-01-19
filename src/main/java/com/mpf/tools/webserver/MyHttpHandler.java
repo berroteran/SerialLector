@@ -5,6 +5,7 @@ import com.mpf.tools.zonaslector.Lector;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
@@ -71,15 +72,27 @@ public class MyHttpHandler implements HttpHandler {
                 .toString()
                 .split("\\?")[1];
         String par  = pars.split("&")[0];
-        String valor = "";
+        String parametros  = pars.trim();
+        par = par.trim();
+        parametros= parametros.trim();
         System.out.println("valor parametros: " + pars);
         System.out.println("valor parametro: " + par);
-        if (par.equals("puerto=print")) {
-            //conviertiendo
-            Atencion atencion = new Atencion(pars);
-            Lector.prinTicket(atencion);
+        try {
+            if (par.equals("puerto=printPre")) {
+                System.out.println("Entro a preetiqueta");
+                //conviertiendo
+                Atencion atencion = new Atencion(parametros);
+                atencion.printPreEtiqueta();
+            }
+            if (par.equals("puerto=printTicket")) {
+                Atencion atencion = new Atencion(parametros);
+                atencion.printTicket();
+            }
+        }catch(Exception e){
+            JOptionPane.showMessageDialog(Lector.getInstancia(), e.getMessage(), "Error a intentar reporte desde la SAP-ZONAS.",
+                    JOptionPane.ERROR_MESSAGE);
         }
-        return valor;
+        return "";
     }
 
 

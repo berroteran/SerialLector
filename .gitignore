@@ -1,2 +1,7 @@
 # Project exclude paths
 /target/
+/.idea/
+/.settings/
+.classpath
+.project
+Escriba Noombre impresora
