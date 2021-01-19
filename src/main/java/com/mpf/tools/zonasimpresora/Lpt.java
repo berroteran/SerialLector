@@ -1,6 +1,7 @@
 package com.mpf.tools.zonasimpresora;
 
-import java.io.*;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 
 public class Lpt {
 	public static void test(String portName) throws Exception {

@@ -10,7 +10,8 @@
  */
 package com.mpf.tools.zonasimpresora.zebra.listeners;
 
-import com.finium.core.drivers.zebra.printer.connection.ConnectionClientException;
+
+import com.mpf.tools.zonasimpresora.zebra.printer.connection.ConnectionClientException;
 
 /**
  * @author Venkaiah Chowdary Koneru

@@ -1,7 +1,7 @@
 package com.mpf.tools.zonasimpresora;
 
-import java.io.*;
-import java.net.*;
+import java.io.DataOutputStream;
+import java.net.Socket;
 
 public class TCPClient {
 

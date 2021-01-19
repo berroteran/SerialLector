@@ -1,8 +1,7 @@
 package com.mpf.tools.zonasimpresora;
 
-import java.io.*;
-
-import javax.sound.sampled.Port;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 
 public class ComCPL {
 	public static void test(String portName) throws Exception {

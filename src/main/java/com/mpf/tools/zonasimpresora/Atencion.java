@@ -6,8 +6,6 @@ import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
 import javax.swing.*;
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.ArrayList;
 
 public class Atencion {
 

@@ -10,13 +10,10 @@
  */
 package com.mpf.tools.zonasimpresora.zebra.model;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
-
 import com.finium.core.drivers.zebra.zpl.support.ZplUtils;
+
+import java.awt.*;
+import java.awt.geom.Rectangle2D;
 
 /**
  * 

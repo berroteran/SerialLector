@@ -10,7 +10,7 @@
  */
 package com.mpf.tools.zonasimpresora.zebra.listeners;
 
-import com.finium.core.drivers.zebra.printer.connection.ZebraConnectionClient;
+import com.mpf.tools.zonasimpresora.zebra.printer.connection.ZebraConnectionClient;
 
 /**
  * This listener provide a callback structure or listener pattern template for

@@ -7,8 +7,19 @@ package com.mpf.tools.zonaslector;
 
 import com.fazecast.jSerialComm.SerialPort;
 import com.mpf.tools.webserver.SimpleHTTPServer;
-import com.mpf.tools.zonasimpresora.*;
+import com.mpf.tools.zonasimpresora.Atencion;
+import com.mpf.tools.zonasimpresora.ComCPL;
+import com.mpf.tools.zonasimpresora.Lpt;
 import com.sun.net.httpserver.HttpServer;
+
+import javax.imageio.ImageIO;
+import javax.print.*;
+import javax.print.attribute.AttributeSet;
+import javax.print.attribute.HashAttributeSet;
+import javax.print.attribute.HashPrintRequestAttributeSet;
+import javax.print.attribute.standard.ColorSupported;
+import javax.print.attribute.standard.PrinterName;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -25,19 +36,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.imageio.ImageIO;
-import javax.print.Doc;
-import javax.print.DocFlavor;
-import javax.print.DocPrintJob;
-import javax.print.PrintService;
-import javax.print.PrintServiceLookup;
-import javax.print.SimpleDoc;
-import javax.print.attribute.AttributeSet;
-import javax.print.attribute.HashAttributeSet;
-import javax.print.attribute.HashPrintRequestAttributeSet;
-import javax.print.attribute.standard.ColorSupported;
-import javax.print.attribute.standard.PrinterName;
-import javax.swing.*;
 
 /**
  * @author berroteran

@@ -2,9 +2,6 @@ package com.mpf.tools.zonaslector;
 
 import com.fazecast.jSerialComm.SerialPort;
 
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-
 public class ReadPortsBascula implements Runnable {
 
     String name;

@@ -10,11 +10,11 @@
  */
 package com.mpf.tools.zonasimpresora.zebra.printer;
 
-import java.util.List;
-
 import com.finium.core.drivers.zebra.model.ZebraLabel;
 import com.finium.core.drivers.zebra.printer.connection.ZebraConnectionClient;
 import com.finium.core.drivers.zebra.zpl.support.exceptions.ZebraPrintException;
+
+import java.util.List;
 
 /**
  * @author Venkaiah Chowdary Koneru

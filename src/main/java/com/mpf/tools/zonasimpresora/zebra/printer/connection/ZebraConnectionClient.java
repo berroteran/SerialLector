@@ -10,8 +10,8 @@
  */
 package com.mpf.tools.zonasimpresora.zebra.printer.connection;
 
-import com.finium.core.drivers.zebra.listeners.ClientListener;
-import com.finium.core.drivers.zebra.listeners.DataListener;
+import com.mpf.tools.zonasimpresora.zebra.listeners.ClientListener;
+import com.mpf.tools.zonasimpresora.zebra.listeners.DataListener;
 
 /**
  * This interface define the Connection level contract with the zebra system.
