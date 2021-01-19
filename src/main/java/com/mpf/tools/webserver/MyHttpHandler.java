@@ -77,6 +77,7 @@ public class MyHttpHandler implements HttpHandler {
         parametros= parametros.trim();
         System.out.println("valor parametros: " + pars);
         System.out.println("valor parametro: " + par);
+        System.out.println( "Balance: " + httpExchange.getRequestHeaders().getFirst("balance") );
         try {
             if (par.equals("puerto=printPre")) {
                 System.out.println("Entro a preetiqueta");
@@ -89,7 +90,7 @@ public class MyHttpHandler implements HttpHandler {
                 atencion.printTicket();
             }
         }catch(Exception e){
-            JOptionPane.showMessageDialog(Lector.getInstancia(), e.getMessage(), "Error a intentar reporte desde la SAP-ZONAS.",
+            JOptionPane.showMessageDialog(Lector.getInstancia(), e.getMessage(), "Error a intentar imprimir resporte desde la SAP-ZONAS.",
                     JOptionPane.ERROR_MESSAGE);
         }
         return "";
