@@ -227,6 +227,7 @@ public class Lector extends javax.swing.JFrame {
         cmdReloadPorts = new javax.swing.JButton();
         CMDCerrar = new javax.swing.JButton();
         chkJustOne = new javax.swing.JCheckBox();
+        chkSoloPrinter = new javax.swing.JCheckBox();
         Impresora = new javax.swing.JLayeredPane();
         cboImpresoras = new javax.swing.JComboBox();
         jLabel3 = new javax.swing.JLabel();
@@ -339,6 +340,8 @@ public class Lector extends javax.swing.JFrame {
             }
         });
 
+        chkSoloPrinter.setText("Solo Impresora");
+
         jLayeredPane1.setLayer(cmdLeerHumedad, javax.swing.JLayeredPane.DEFAULT_LAYER);
         jLayeredPane1.setLayer(jScrollPane1, javax.swing.JLayeredPane.DEFAULT_LAYER);
         jLayeredPane1.setLayer(cmdLeerBascula, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -351,6 +354,7 @@ public class Lector extends javax.swing.JFrame {
         jLayeredPane1.setLayer(cmdReloadPorts, javax.swing.JLayeredPane.DEFAULT_LAYER);
         jLayeredPane1.setLayer(CMDCerrar, javax.swing.JLayeredPane.DEFAULT_LAYER);
         jLayeredPane1.setLayer(chkJustOne, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        jLayeredPane1.setLayer(chkSoloPrinter, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
         javax.swing.GroupLayout jLayeredPane1Layout = new javax.swing.GroupLayout(jLayeredPane1);
         jLayeredPane1.setLayout(jLayeredPane1Layout);
@@ -359,34 +363,33 @@ public class Lector extends javax.swing.JFrame {
             .addGroup(jLayeredPane1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(cmdReloadPorts, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 301, Short.MAX_VALUE)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                    .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jLayeredPane1Layout.createSequentialGroup()
+                            .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(lblPuerto2)
+                                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                            .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(cboBasculaPort, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(cboMHumedadPort, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGap(38, 38, 38))
+                        .addGroup(jLayeredPane1Layout.createSequentialGroup()
+                            .addComponent(cmdStartWebServer2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))))
+                .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(cmdLeerBascula, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(cmdLeerHumedad, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
+                    .addComponent(chk2Basculas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jLayeredPane1Layout.createSequentialGroup()
-                        .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(cmdReloadPorts, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 301, Short.MAX_VALUE)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                        .addGap(18, 18, 18)
-                        .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(cmdLeerBascula, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(cmdLeerHumedad, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(CMDCerrar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addContainerGap())
+                    .addComponent(chkJustOne, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
                     .addGroup(jLayeredPane1Layout.createSequentialGroup()
-                        .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jLayeredPane1Layout.createSequentialGroup()
-                                .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(lblPuerto2)
-                                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(cboBasculaPort, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(cboMHumedadPort, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(38, 38, 38))
-                            .addGroup(jLayeredPane1Layout.createSequentialGroup()
-                                .addComponent(cmdStartWebServer2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
-                        .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(chk2Basculas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(chkJustOne, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
-                            .addGroup(jLayeredPane1Layout.createSequentialGroup()
-                                .addComponent(CMDCerrar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addContainerGap())))))
+                        .addComponent(chkSoloPrinter, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         jLayeredPane1Layout.setVerticalGroup(
             jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -409,11 +412,13 @@ public class Lector extends javax.swing.JFrame {
                         .addComponent(cmdLeerBascula, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(cmdLeerHumedad, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(58, 58, 58)
+                        .addGap(26, 26, 26)
                         .addComponent(chk2Basculas)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkJustOne)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(chkJustOne)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkSoloPrinter)))
+                .addGap(13, 13, 13)
                 .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(CMDCerrar, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(cmdStartWebServer2, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -966,6 +971,7 @@ public class Lector extends javax.swing.JFrame {
     private javax.swing.JComboBox cboMHumedadPort;
     private javax.swing.JCheckBox chk2Basculas;
     private javax.swing.JCheckBox chkJustOne;
+    private javax.swing.JCheckBox chkSoloPrinter;
     private javax.swing.JButton cmdElegir;
     private javax.swing.JButton cmdLeerBascula;
     private javax.swing.JButton cmdLeerHumedad;
@@ -1110,26 +1116,30 @@ public class Lector extends javax.swing.JFrame {
     }
 
     private void iniciarServicio() throws Exception {
-        // validando si ambos puertos son los mismos.
-        if (PuertoSerialMod.comparePorts(cboBasculaPort, cboMHumedadPort)) {
-            if (!this.chkJustOne.isSelected()) {
-                throw new Exception("Los puertos a utilizar no pueden ser el mismo. ");
+        if ( chkSoloPrinter.isSelected() ){
+
+        }else {
+            // validando si ambos puertos son los mismos.
+            if (PuertoSerialMod.comparePorts(cboBasculaPort, cboMHumedadPort)) {
+                if (!this.chkJustOne.isSelected()) {
+                    throw new Exception("Los puertos a utilizar no pueden ser el mismo. ");
+                }
             }
-        }
 
-        // verificar puerto 01
-        if (!Lector.leyendoPuerto1) {
-            iniciarLeerPuertoB01();
-        }
+            // verificar puerto 01
+            if (!Lector.leyendoPuerto1) {
+                iniciarLeerPuertoB01();
+            }
 
-        // verificar si se puede leer puerto 01
-        // verificar si esta baierto puerto 02
-        if (!chkJustOne.isSelected()) {
-            if (!Lector.leyendoPuerto2) {
-                if (chk2Basculas.isSelected()) {
-                    iniciarLeerPuertoB02();
-                } else {
-                    iniciarLeerPuertoMHumedad();
+            // verificar si se puede leer puerto 01
+            // verificar si esta baierto puerto 02
+            if (!chkJustOne.isSelected()) {
+                if (!Lector.leyendoPuerto2) {
+                    if (chk2Basculas.isSelected()) {
+                        iniciarLeerPuertoB02();
+                    } else {
+                        iniciarLeerPuertoMHumedad();
+                    }
                 }
             }
         }
