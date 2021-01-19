@@ -16,22 +16,25 @@ public class Atencion {
     private String noAtencion;
     private String fechaCompra;
     private boolean tipoCompraOficina = true;
-    private String proveedor;
-    private String producto;
-    private Integer diasEscurrido;
-    private BigDecimal pesoTotal;
+    private BigDecimal pesoBruto;
+    private BigDecimal pesoNeto;
+    private String proveedorNombre;
     private BigDecimal humedad;
     private BigDecimal impureza;
-    private BigDecimal pesoNeto;
-    private BigDecimal pesoPagadoCampo;
-    private BigDecimal humedadCampo;
-    private BigDecimal impurezaCampo;
+    private String codOficina;
     private String oficina;
-    private Integer etiquetaImpresiones;
+    private Integer impresiones;
+    private String productocodigo;
+    private String productosap;
+    private String productoNombre;
+
 
     public Atencion(String pars) {
-        String[] p = pars.split("&");
-        System.out.println( p );
+        String parxxxxxx  = pars.split("&")[0];
+        String noAtencion = pars.split("&")[1];
+        System.out.println("COSNTRUCTOR. No de atencion: " + noAtencion);
+        this.noAtencion = noAtencion.split("=")[0];
+        System.out.println("COSNTRUCTOR. No de atencion: " + this.noAtencion);
     }
 
     public void printPreEtiqueta() {
@@ -41,40 +44,85 @@ public class Atencion {
                 throw new Exception("No existen impresoras instaladas");
             }
 
+            for ( int i=0;i<this.impresiones;i++) {
+                javax.print.DocPrintJob job = pservice.createPrintJob();
+                String commands = "" +
+                        "" +
+                        "^XA~TA000~JSN^LT0^MNW^MTT^PON^PMN^LH0,0^JMA^PR4,4~SD15^JUS^LRN^CI0^XZ\n" +
+                        "^XA\n" +
+                        "^MMT\n" +
+                        "^PW815\n" +
+                        "^LL0302\n" +
+                        "^LS0\n" +
+                        "^FO17,210^ADN\n" +
+                        "^B3N, N,50, Y, N, Y^FDA>" + this.noAtencion + "^FS\n" +
+                        "\n" +
+                        "^FT17,39^A0N,28,28^FH\\^FDPRE-ETIQUETA^FS\n" +
+                        "^FT646,238^A0N,23,24^FH\\^FD" + this.productocodigo + "^FS\n" +
+                        "^FT17,88^A0N,39,38^FH\\^FD" + this.noAtencion + "^FS\n" +
+                        "^FT319,31^A0N,20,19^FH\\^FD" + this.fechaCompra + "^FS\n" +
+                        "^FT309,189^A0N,85,84^FB394,1,0,R^FH\\^FD" + this.pesoNeto + "^FS\n" +
+                        "^FT717,183^A0N,46,40^FH\\^FDkg^FS\n" +
+                        "^FT733,51^A0N,44,50^FH\\^FD" + i + "/" + this.impresiones + "^FS\n" +
+                        "^FT17,120^A0N,20,19^FH\\^FD" + this.proveedorNombre + "^FS\n" +
+                        "^FT17,155^A0N,26,26^FH\\^FD" + this.humedad + "% Humedad^FS\n" +
+                        "^FT17,192^A0N,26,26^FH\\^FD" + this.impureza + "% Impureza^FS\n" +
+                        "^FT646,265^A0N,23,24^FH\\^FD" + this.productosap + "^FS\n" +
+                        "^FT562,27^A0N,20,19^FH\\^FDPeso Bruto:^FS\n" +
+                        "^FT550,54^A0N,23,24^FB121,1,0,R^FH\\^FD" + this.pesoBruto + "kg^FS\n" +
+                        "^PQ1,0,1,Y\n" +
+                        "^XZ ";
+                javax.print.DocFlavor flavor = javax.print.DocFlavor.BYTE_ARRAY.AUTOSENSE;
+                javax.print.Doc doc = new javax.print.SimpleDoc(commands.getBytes(), flavor, null);
+                job.print(doc, null);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(Lector.getLector(), e.getMessage(), "Error a intentar imprimir usando prinr service: ",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public  void printTicket() {
+        try {
+            PrintService pservice = PrintServiceLookup.lookupDefaultPrintService();
+            if (pservice == null) {
+                throw new Exception("No existen impresoras instaladas");
+            }
+
             javax.print.DocPrintJob job = pservice.createPrintJob();
-            String commands = ""
-                    + "" +
+            String commands = "" +
                     "^XA~TA000~JSN^LT0^MNW^MTT^PON^PMN^LH0,0^JMA^PR4,4~SD15^JUS^LRN^CI0^XZ\n" +
                     "^XA\n" +
                     "^MMT\n" +
-                    "^PW767\n" +
+                    "^PW815\n" +
                     "^LL0302\n" +
                     "^LS0\n" +
-                    "^FO0,192^GFA,06144,06144,00064,:Z64:\n" +
-                    "eJzty6ENgDAQQNEqWAEUK5Cc7ywoWOIEY7SKWeqbsAVYklPnEGyAwPC//XkhEBER0Ys6OasnObTf4lTdmqUWO7RkG9XzNWsd4jy5SbvnFPWZJo36isfj8Xg8Ho/H4/H4Dz3Rb7sB8LVmsQ==:BCFF\n" +
-                    "^FT17,39^A0N,28,28^FH\\^FDPRE-ETIQUETA^FS\n" +
-                    "^FT539,268^A0N,23,36^FH\\^FDCA0000001^FS\n" +
-                    "^FT17,88^A0N,39,62^FH\\^FDA2110102000005^FS\n" +
-                    "^FT289,31^A0N,20,28^FH\\^FD14/01/2021^FS\n" +
-                    "^FT466,174^A0N,106,103^FH\\^FD69.01^FS\n" +
-                    "^FT700,187^A0N,56,55^FH\\^FDkg^FS\n" +
-                    "^FT693,59^A0N,51,50^FH\\^FD1/2^FS\n" +
-                    "^FT17,121^A@N,20,20,TT0003M_^FH\\^CI17^F8^FDRENEE AYVAR YAULI^FS^CI0\n" +
-                    "^FT14,156^A@N,26,29,TT0003M_^FH\\^CI17^F8^FD 9.5% Humedad^FS^CI0\n" +
-                    "^FT14,193^A@N,26,29,TT0003M_^FH\\^CI17^F8^FD 1.5% Impureza^FS^CI0\n" +
-                    "^PQ1,0,1,Y"
-                    + "^XZ ";
+                    "^FO17,84^ADN\n" +
+                    "^B3N, N,55, Y, N,Y^FDA>"+this.noAtencion+"^FS\n" +
+                    "\n" +
+                    "^FT646,292^A0N,20,19^FH\\^FD("+this.impresiones+") Pre-Etiquetas^FS\n" +
+                    "^FT386,59^A0N,55,55^FB382,1,0,R^FH\\^FD"+this.noAtencion+"^FS\n" +
+                    "^FT633,84^A0N,20,19^FH\\^FD"+this.fechaCompra+"^FS\n" +
+                    "^FT88,278^A0N,70,79^FB403,1,0,R^FH\\^FD"+this.pesoNeto+"^FS\n" +
+                    "^FT528,289^A0N,42,40^FH\\^FDkg.^FS\n" +
+                    "^FT17,187^A0N,20,19^FH\\^FD"+this.proveedorNombre+"^FS\n" +
+                    "^FT599,230^A0N,23,24^FB159,1,0,R^FH\\^FD"+this.humedad+"% Humedad^FS\n" +
+                    "^FT602,259^A0N,23,24^FB156,1,0,R^FH\\^FD"+this.impureza+"% Impureza^FS\n" +
+                    "^FT17,38^A0N,25,24^FH\\^FDMACHU PICCHU FOODS SAC^FS\n" +
+                    "^FT17,69^A0N,25,24^FH\\^FD"+this.oficina+"^FS\n" +
+                    "^FT277,218^A0N,23,24^FH\\^FD"+this.productoNombre+"^FS\n" +
+                    "^FT565,185^A0N,23,24^FB210,1,0,R^FH\\^FD"+this.pesoBruto+"kg  Peso Bruto^FS\n" +
+                    "^FT17,249^A0N,23,24^FH\\^FDPeso ^FS\n" +
+                    "^FT17,277^A0N,23,24^FH\\^FDNeto^FS\n" +
+                    "^PQ1,0,1,Y" +
+                    "^XZ";
             javax.print.DocFlavor flavor = javax.print.DocFlavor.BYTE_ARRAY.AUTOSENSE;
             javax.print.Doc doc = new javax.print.SimpleDoc(commands.getBytes(), flavor, null);
             job.print(doc, null);
 
-        }catch(Exception e) {
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(Lector.getLector(), e.getMessage(), "Error a intentar imprimir usando prinr service: ",
                     JOptionPane.ERROR_MESSAGE);
         }
-}
-
-    public static void printTicket(){
-
     }
 }
