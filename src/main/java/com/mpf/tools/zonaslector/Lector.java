@@ -268,7 +268,7 @@ public class Lector extends javax.swing.JFrame {
         lblStatus.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         lblStatus.setName("lblStatus"); // NOI18N
 
-        jLabel2.setText("Ver 0.8.55");
+        jLabel2.setText("Ver 0.8.29");
 
         panelSensores.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
