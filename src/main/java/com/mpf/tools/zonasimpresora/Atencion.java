@@ -97,6 +97,8 @@ public class Atencion {
                         "^PW815\n" +
                         "^LL0302\n" +
                         "^LS0\n" +
+                        "^MD30\n" +  //Darkness
+                        "~SD30" +
                         "^FO17,210^ADN\n" +
                         "^B3N, N,50, Y, N, Y^FDA>" + this.noAtencion + "^FS\n" +
                         "\n" +
@@ -143,6 +145,8 @@ public class Atencion {
                     "^PW815\n" +
                     "^LL0302\n" +
                     "^LS0\n" +
+                    "^MD30\n" + //Darnkess
+                    "~SD30" +
                     "^FO17,84^ADN\n" +
                     "^B3N, N,55, Y, N,Y^FDA>"+this.noAtencion+"^FS\n" +
                     "\n" +
