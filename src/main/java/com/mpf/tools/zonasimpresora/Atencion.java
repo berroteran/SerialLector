@@ -5,6 +5,7 @@ import com.mpf.tools.zonaslector.Lector;
 import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
 import javax.swing.*;
+import java.awt.*;
 import java.math.BigDecimal;
 
 public class Atencion {
@@ -29,7 +30,7 @@ public class Atencion {
 
     public Atencion(String pars) {
         for (String par : pars.split("&")) {
-            System.out.println("parmaetro " + par);
+            System.out.println("parametro " + par);
             switch (par.split("=")[0]){
                 case "productosap":
                     this.productosap = par.split("=")[1];
@@ -73,6 +74,8 @@ public class Atencion {
                 case "tipoCompraOficina":
                     this.tipoCompraOficina = Boolean.valueOf( par.split("=")[1]);
                     break;
+                default:
+                    System.out.println("Valor detectado:: " + par.split("=")[0]);
             }
         }
         //print
@@ -87,7 +90,7 @@ public class Atencion {
             }
 
             for ( int i=0;i< Integer.valueOf(this.impresiones).intValue();i++) {
-                System.out.println("Imprimientod Pre-Etiquetas");
+                System.out.println("Imprimiendo Pre-Etiquetas");
                 javax.print.DocPrintJob job = pservice.createPrintJob();
                 String commands = "" +
                         "" +
@@ -120,10 +123,11 @@ public class Atencion {
                 javax.print.DocFlavor flavor = javax.print.DocFlavor.BYTE_ARRAY.AUTOSENSE;
                 javax.print.Doc doc = new javax.print.SimpleDoc(commands.getBytes(), flavor, null);
                 job.print(doc, null);
+                //print message
+                Lector.getTrayIcon().displayMessage("Imprimiendo PreEtiqueta", "Atención: " + this.noAtencion + "", TrayIcon.MessageType.INFO);
             }
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(Lector.getLector(), e.getMessage(), "Error a intentar imprimir usando prinr service: ",
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(Lector.getLector(), e.getMessage(), "Error a intentar imprimir usando prinr service: ", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -135,7 +139,7 @@ public class Atencion {
                 throw new Exception("No existen impresoras instaladas");
             }
 
-            System.out.println("Imprimientod Pre-Etiquetas");
+            System.out.println("Imprimientod TICKET");
 
             javax.print.DocPrintJob job = pservice.createPrintJob();
             String commands = "" +
@@ -169,6 +173,8 @@ public class Atencion {
             javax.print.DocFlavor flavor = javax.print.DocFlavor.BYTE_ARRAY.AUTOSENSE;
             javax.print.Doc doc = new javax.print.SimpleDoc(commands.getBytes(), flavor, null);
             job.print(doc, null);
+
+            Lector.getTrayIcon().displayMessage("Imprimiendo Tickets", "Atención: " + this.noAtencion + "", TrayIcon.MessageType.INFO);
 
         } catch (Exception e) {
             JOptionPane.showMessageDialog(Lector.getLector(), e.getMessage(), "Error a intentar imprimir usando prinr service: ",  JOptionPane.ERROR_MESSAGE);

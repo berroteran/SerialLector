@@ -45,7 +45,7 @@ public class Lector extends javax.swing.JFrame {
     // variables
     List<PuertoSerialMod> ports;
     static TrayIcon trayIcon;
-    SystemTray tray;
+    SystemTray sysTray;
 
     // static
     private static Boolean modoDeveloper = false;
@@ -78,15 +78,15 @@ public class Lector extends javax.swing.JFrame {
 
         //
         if (SystemTray.isSupported()) {
-            tray = SystemTray.getSystemTray();
+            sysTray = SystemTray.getSystemTray();
 
-            Image image = Toolkit.getDefaultToolkit()
-                    .getImage((URL) getClass().getClassLoader().getResource("icons/iconobascula.png"));
+            Image image = Toolkit.getDefaultToolkit() .getImage((URL) getClass().getClassLoader().getResource("icons/iconobascula.png"));
             ActionListener exitListener = new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     System.exit(0);
                 }
             };
+
             PopupMenu popup = new PopupMenu();
             MenuItem defaultItem = new MenuItem("Salir");
             defaultItem.addActionListener(exitListener);
@@ -112,7 +112,7 @@ public class Lector extends javax.swing.JFrame {
             public void windowStateChanged(WindowEvent e) {
                 if (e.getNewState() == ICONIFIED) {
                     try {
-                        tray.add(trayIcon);
+                        sysTray.add(trayIcon);
                         setVisible(false);
                         System.out.println("added to SystemTray");
                     } catch (AWTException ex) {
@@ -121,7 +121,7 @@ public class Lector extends javax.swing.JFrame {
                 }
                 if (e.getNewState() == 7) {
                     try {
-                        tray.add(trayIcon);
+                        sysTray.add(trayIcon);
                         setVisible(false);
                         System.out.println("added to SystemTray");
                     } catch (AWTException ex) {
@@ -129,12 +129,12 @@ public class Lector extends javax.swing.JFrame {
                     }
                 }
                 if (e.getNewState() == MAXIMIZED_BOTH) {
-                    tray.remove(trayIcon);
+                    sysTray.remove(trayIcon);
                     setVisible(true);
                     System.out.println("Tray icon removed");
                 }
                 if (e.getNewState() == NORMAL) {
-                    tray.remove(trayIcon);
+                    sysTray.remove(trayIcon);
                     setVisible(true);
                     System.out.println("Tray icon removed");
                 }
@@ -268,7 +268,7 @@ public class Lector extends javax.swing.JFrame {
         lblStatus.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         lblStatus.setName("lblStatus"); // NOI18N
 
-        jLabel2.setText("Ver 0.8.30");
+        jLabel2.setText("Ver 0.8.31");
 
         panelSensores.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
@@ -1149,7 +1149,7 @@ public class Lector extends javax.swing.JFrame {
 
         // ocultar
         try {
-            tray.add(trayIcon);
+            sysTray.add(trayIcon);
         } catch (Exception e) {
         }
         setVisible(false);
@@ -1229,6 +1229,22 @@ public class Lector extends javax.swing.JFrame {
             printerName = "Problema Detectando Print.";
             printerException = e.getMessage();
         }
+    }
+
+    public static TrayIcon getTrayIcon() {
+        return trayIcon;
+    }
+
+    public static void setTrayIcon(TrayIcon trayIcon) {
+        Lector.trayIcon = trayIcon;
+    }
+
+    public SystemTray getSysTray() {
+        return sysTray;
+    }
+
+    public void setSysTray(SystemTray sysTray) {
+        this.sysTray = sysTray;
     }
 
 }
