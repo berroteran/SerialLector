@@ -103,7 +103,7 @@ public class Atencion {
                         "^MD30\n" +  //Darkness
                         "~SD30" +
                         "^FO17,210^ADN\n" +
-                        "^B3N, N,50, Y, N, Y^FDA>" + this.noAtencion + "^FS\n" +
+                        "^B3N, N,50, Y, N, Y^FDA>" + this.noAtencion.replaceAll("A","") + "^FS\n" +
                         "\n" +
                         "^FT17,39^A0N,28,28^FH\\^FDPRE-ETIQUETA^FS\n" +
                         "^FT646,238^A0N,23,24^FH\\^FD" + this.productocodigo + "^FS\n" +
@@ -152,7 +152,7 @@ public class Atencion {
                     "^MD30\n" + //Darnkess
                     "~SD30" +
                     "^FO17,84^ADN\n" +
-                    "^B3N, N,55, Y, N,Y^FDA>"+this.noAtencion+"^FS\n" +
+                    "^B3N, N,55, Y, N,Y^FDA>"+this.noAtencion.replaceAll("A","")  +"^FS\n" +
                     "\n" +
                     "^FT646,292^A0N,20,19^FH\\^FD("+this.impresiones+") Pre-Etiquetas^FS\n" +
                     "^FT386,59^A0N,55,55^FB382,1,0,R^FH\\^FD"+this.noAtencion+"^FS\n" +
